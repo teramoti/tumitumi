@@ -1,0 +1,38 @@
+{
+  "hash": "bf9bdec3",
+  "configHash": "c2e5d85b",
+  "lockfileHash": "63c0439a",
+  "browserHash": "f18ff608",
+  "optimized": {
+    "phaser": {
+      "src": "../../node_modules/phaser/dist/phaser.esm.js",
+      "file": "phaser.js",
+      "fileHash": "d2e10eed",
+      "needsInterop": false
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "c2505949",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "63ea0b4c",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "48815c39",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-DoKv51gm": {
+      "file": "chunk-DoKv51gm.js",
+      "isDynamicEntry": false
+    }
+  }
+}
