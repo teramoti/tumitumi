@@ -247,11 +247,8 @@ body {
 .backButton,
 .nextReviewButton,
 .skipReviewButton {
-  border: none;
   font-family: inherit;
   font-weight: 1000;
-  cursor: pointer;
-  transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
 }
 
 .backButton,
@@ -264,18 +261,6 @@ body {
   border-radius: 18px;
   box-shadow: 0 6px 0 rgba(27, 88, 49, .7);
   font-size: 24px;
-}
-
-.backButton:hover,
-.nextReviewButton:hover,
-.skipReviewButton:hover {
-  filter: brightness(1.05);
-}
-
-.backButton:active,
-.nextReviewButton:active,
-.skipReviewButton:active {
-  transform: translateY(3px);
 }
 
 .rankingBackButton {

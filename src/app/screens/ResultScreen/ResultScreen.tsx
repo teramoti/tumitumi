@@ -4,7 +4,7 @@ import './ResultScreen.css'
 import type { CSSProperties } from 'react'
 import { getRanksFromScores } from '../../../utils/Result.js'
 import type { GameResult, PlayerResult } from '../../App'
-import resultBgm from '../../../../assets/audio/result.mp3'
+const resultBgm = '/assets/result_bgm.wav'
 import { playClickSound } from '../../audio/playClickSound'
 
 type Props = {
@@ -18,10 +18,10 @@ type ReviewGridProps = {
 }
 
 const ROBOT_IMAGE_PATHS = [
-  '/assets/images/characters/robot_p1.png',
-  '/assets/images/characters/robot_p2.png',
-  '/assets/images/characters/robot_p3.png',
-  '/assets/images/characters/robot_p4.png'
+  '/assets/char_robot_p1.png',
+  '/assets/char_robot_p2.png',
+  '/assets/char_robot_p3.png',
+  '/assets/char_robot_p4.png'
 ]
 
 function getRankComment(rank: number) {
@@ -145,11 +145,9 @@ export default function ResultScreen({ result, onBack }: Props) {
     }
 
     playBgm()
-    window.addEventListener('pointerdown', playBgm, { once: true })
     window.addEventListener('keydown', playBgm, { once: true })
 
     return () => {
-      window.removeEventListener('pointerdown', playBgm)
       window.removeEventListener('keydown', playBgm)
       audio.pause()
       audio.currentTime = 0
@@ -257,6 +255,39 @@ export default function ResultScreen({ result, onBack }: Props) {
     }, 250)
   }
 
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.repeat) return
+      const isConfirmKey = event.key === ' ' || event.key === 'Space' || event.key === 'Spacebar' || event.key === 'Enter'
+
+      if (isRankingVisible) {
+        if (!isBackButtonVisible) return
+        if (isConfirmKey) {
+          event.preventDefault()
+          handleBack()
+        }
+        return
+      }
+
+      if (event.key === 's' || event.key === 'S') {
+        event.preventDefault()
+        handleSkipReview()
+        return
+      }
+
+      if (isConfirmKey) {
+        event.preventDefault()
+        handleNextReview()
+      }
+    }
+
+    window.addEventListener('keydown', handler)
+
+    return () => {
+      window.removeEventListener('keydown', handler)
+    }
+  })
+
   // 以下でリザルト部分の画面HTML生成
   return (
     <div className={`resultBackColor ${isRankingVisible ? 'rankingBackground' : 'answerCheckBackground'}`}>
@@ -265,14 +296,12 @@ export default function ResultScreen({ result, onBack }: Props) {
       <div className={`resultScreen ${isRankingVisible ? 'rankingScreen' : 'answerCheckScreen'} ${isFading ? 'resultScreenFading' : ''}`}>
 
         {!isRankingVisible && (
-          <button
+          <div
             className="skipReviewButton"
-            type="button"
-            onClick={handleSkipReview}
-            disabled={isFading}
+            aria-disabled={isFading}
           >
-            スキップ
-          </button>
+            S スキップ
+          </div>
         )}
 
         {isRankingVisible && isConfettiVisible && (
@@ -299,7 +328,7 @@ export default function ResultScreen({ result, onBack }: Props) {
         <header className={`resultHeader ${isRankingVisible ? 'rankingHeader' : 'answerCheckHeader'}`}>
 
           <h1 className={`rankTitle ${isRankingVisible ? '' : 'answerCheckTitle'}`}>
-            {isRankingVisible ? '雑貨つみ結果発表！' : 'プレイ確認'}
+            {isRankingVisible ? 'デスクつみ結果発表！' : 'プレイ確認'}
           </h1>
 
           {!isRankingVisible && (
@@ -399,23 +428,21 @@ export default function ResultScreen({ result, onBack }: Props) {
         <footer className={`resultFooter ${isRankingVisible ? '' : 'answerCheckFooter'}`}>
 
           {isRankingVisible ? (
-            <button
+            <div
               className={`backButton rankingBackButton ${isBackButtonVisible ? 'rankingBackButtonVisible' : ''}`}
               hidden={!isBackButtonVisible}
-              onClick={handleBack}
             >
-              タイトルへ戻る
-            </button>
+              SPACE / ENTER タイトルへ
+            </div>
           ) : (
-            <button
+            <div
               className="nextReviewButton"
-              onClick={handleNextReview}
-              disabled={isFading}
+              aria-disabled={isFading}
             >
               {reviewIndex < reviewsByPlayer.length - 1
-                ? '次のプレイヤー'
-                : '最終順位を見る'}
-            </button>
+                ? 'SPACE / ENTER 次へ'
+                : 'SPACE / ENTER 順位'}
+            </div>
           )}
 
         </footer>

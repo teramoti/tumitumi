@@ -21,25 +21,106 @@ const MATTER = Phaser.Physics.Matter.Matter
 const WORLD = {
     width: 1280,
     height: 720,
-    tableCenterX: 642,
+    tableCenterX: 648,
     tableCenterY: 600,
     tableTopY: 580,
-    tableWidth: 540,
+    tableWidth: 560,
     tableHeight: 38,
     groundY: 690,
     faultLineY: 656,
-    leftLimitX: 265,
-    rightLimitX: 1018,
+    leftLimitX: 360,
+    rightLimitX: 936,
 }
 
 const PLAYER_COLORS = [0xe94834, 0x2f73c9, 0x2da65d, 0xf0a51f]
 const PLAYER_DARK_COLORS = [0xa22d24, 0x1e4f91, 0x1f7143, 0x9b6413]
-const LANE_OFFSETS = [-216, -108, 0, 108, 216]
+const PLACEMENT = {
+    minX: WORLD.tableCenterX - WORLD.tableWidth / 2 + 36,
+    maxX: WORLD.tableCenterX + WORLD.tableWidth / 2 - 36,
+    keyStep: 16,
+}
+
+const PLAYER_FLOOR = {
+    startX: 356,
+    gap: 92,
+    y: 673,
+    currentY: 650,
+}
+
+const TIMING = {
+    cycleMs: 1350,
+    barWidth: 270,
+    perfectRange: 0.08,
+    goodRange: 0.22,
+    perfectBonus: 70,
+    goodBonus: 30,
+    badAnglePenalty: 0.1,
+    badSpin: 0.055,
+}
+
+const TARGET_ZONE = {
+    bonus: 60,
+    radius: 42,
+}
+
+const FEVER = {
+    triggerStreak: 3,
+    bonus: 100,
+}
+
+const BOOST = {
+    multiplier: 2.5,
+}
+
+const ROUND_DROP = {
+    enabledFromRound: 2,
+    pool: ['smallCan', 'dice', 'key', 'watch', 'earphoneJack', 'battery', 'clip'],
+    baseCount: 2,
+    maxCount: 3,
+}
+
+const ROUND_SCALE = {
+    step: 0.12,
+    max: 1.45,
+}
 
 const DIFFICULTY_CONFIG = {
-    easy: { gravity: 0.96, settleMs: 700, cardPool: ['book', 'notebook', 'eraser', 'box', 'pencilCase', 'smallCan'], label: 'ゆるめ' },
-    normal: { gravity: 1.05, settleMs: 760, cardPool: ['book', 'notebook', 'eraser', 'box', 'pencilCase', 'smallCan', 'ruler', 'tape'], label: 'ふつう' },
-    hard: { gravity: 1.12, settleMs: 840, cardPool: ['book', 'notebook', 'eraser', 'box', 'pencilCase', 'smallCan', 'ruler', 'tape', 'mug', 'battery'], label: 'ぐらぐら' },
+    easy: {
+        gravity: 0.9,
+        settleMs: 560,
+        minWaitMs: 760,
+        timeoutMs: 6000,
+        stableSpeed: 0.18,
+        stableAngularVelocity: 0.032,
+        angleJitter: 0.015,
+        frictionAir: 0.006,
+        cardPool: ['book', 'notebook', 'eraser', 'box', 'pencilCase', 'marker', 'clip', 'card', 'earphoneJack'],
+        label: 'ゆるめ',
+    },
+    normal: {
+        gravity: 1.02,
+        settleMs: 680,
+        minWaitMs: 880,
+        timeoutMs: 6800,
+        stableSpeed: 0.15,
+        stableAngularVelocity: 0.026,
+        angleJitter: 0.04,
+        frictionAir: 0.003,
+        cardPool: ['book', 'notebook', 'eraser', 'box', 'pencilCase', 'smallCan', 'ruler', 'tape', 'marker', 'glue', 'stapler', 'clip', 'key', 'card', 'watch', 'earphoneJack'],
+        label: 'ふつう',
+    },
+    hard: {
+        gravity: 1.1,
+        settleMs: 880,
+        minWaitMs: 1050,
+        timeoutMs: 7600,
+        stableSpeed: 0.11,
+        stableAngularVelocity: 0.02,
+        angleJitter: 0.08,
+        frictionAir: 0.0016,
+        cardPool: ['book', 'notebook', 'eraser', 'box', 'pencilCase', 'smallCan', 'ruler', 'tape', 'mug', 'battery', 'marker', 'glue', 'stapler', 'scissors', 'phone', 'dice', 'clip', 'key', 'watch', 'card', 'headphones', 'earphoneJack'],
+        label: 'ぐらぐら',
+    },
 }
 
 const ITEM_KINDS = {
@@ -93,10 +174,165 @@ const ITEM_KINDS = {
         color: 0x2f3a4a, accent: 0x81e06a, density: 0.0054, friction: 0.64, frictionStatic: 0.46,
         points: 38,
     },
+    marker: {
+        key: 'marker', label: 'マーカー', icon: 'MARK', description: '軽くて細い', shape: 'marker', width: 118, height: 18,
+        color: 0xff7aa5, accent: 0xffffff, density: 0.0026, friction: 0.68, frictionStatic: 0.48,
+        points: 30, noAsset: true,
+    },
+    glue: {
+        key: 'glue', label: 'のり', icon: 'GLUE', description: '背が高い', shape: 'glue', width: 44, height: 72,
+        color: 0xffffff, accent: 0x4bb7ff, density: 0.0038, friction: 0.74, frictionStatic: 0.55,
+        points: 35, noAsset: true,
+    },
+    stapler: {
+        key: 'stapler', label: 'ホチキス', icon: 'STPL', description: '重くて傾く', shape: 'stapler', width: 92, height: 36,
+        color: 0x6f89a5, accent: 0xe8f5ff, density: 0.005, friction: 0.78, frictionStatic: 0.62,
+        points: 36, noAsset: true,
+    },
+    scissors: {
+        key: 'scissors', label: 'はさみ', icon: 'CUT', description: '不規則で危険', shape: 'scissors', width: 104, height: 34,
+        color: 0xd7dce5, accent: 0xef5947, density: 0.0036, friction: 0.58, frictionStatic: 0.38,
+        points: 42, noAsset: true,
+    },
+    phone: {
+        key: 'phone', label: 'スマホ', icon: 'TEL', description: '薄くて重い', shape: 'phone', width: 72, height: 42,
+        color: 0x202938, accent: 0x7dd7ff, density: 0.0062, friction: 0.82, frictionStatic: 0.7,
+        points: 40, noAsset: true,
+    },
+    dice: {
+        key: 'dice', label: 'サイコロ', icon: 'DICE', description: '小さく跳ねる', shape: 'dice', width: 46, height: 46,
+        color: 0xffffff, accent: 0x252525, density: 0.0032, friction: 0.5, frictionStatic: 0.35, restitution: 0.12,
+        points: 44, noAsset: true,
+    },
+    clip: {
+        key: 'clip', label: 'クリップ', icon: 'CLIP', description: '細くて軽い', shape: 'clip', width: 72, height: 22,
+        color: 0xd7dce5, accent: 0x5d7899, density: 0.0024, friction: 0.5, frictionStatic: 0.3,
+        points: 33, noAsset: true,
+    },
+    key: {
+        key: 'key', label: 'カギ', icon: 'KEY', description: '小さくて重心が偏る', shape: 'key', width: 76, height: 28,
+        color: 0xf6c85f, accent: 0x9b6413, density: 0.0048, friction: 0.54, frictionStatic: 0.34,
+        points: 41, noAsset: true,
+    },
+    watch: {
+        key: 'watch', label: '時計', icon: 'TIME', description: '丸くて転がりやすい', shape: 'watch', width: 54, height: 54,
+        color: 0x26384f, accent: 0x9fe6ff, density: 0.004, friction: 0.44, frictionStatic: 0.25, restitution: 0.06,
+        points: 43, noAsset: true,
+    },
+    card: {
+        key: 'card', label: 'カード', icon: 'CARD', description: '薄くて滑りやすい', shape: 'card', width: 88, height: 18,
+        color: 0xffffff, accent: 0xef5947, density: 0.0022, friction: 0.42, frictionStatic: 0.24,
+        points: 31, noAsset: true,
+    },
+    headphones: {
+        key: 'headphones', label: 'イヤホン', icon: 'EAR', description: '形が不安定', shape: 'headphones', width: 86, height: 42,
+        color: 0x6f4fc7, accent: 0xffd65f, density: 0.003, friction: 0.48, frictionStatic: 0.3,
+        points: 46, noAsset: true,
+    },
+    earphoneJack: {
+        key: 'earphoneJack', label: 'イヤホンジャック', icon: 'JACK', description: '細くて先端が重い', shape: 'earphoneJack', width: 96, height: 20,
+        color: 0x2f3a4a, accent: 0xcdd5e2, density: 0.0046, friction: 0.5, frictionStatic: 0.32,
+        points: 48, noAsset: true,
+    },
 }
+
+const CHALLENGES = [
+    {
+        key: 'safe',
+        label: '安全第一',
+        hint: '崩さず置く',
+        bonus: 40,
+        matches: () => true,
+    },
+    {
+        key: 'center',
+        label: '中央勝負',
+        hint: '中央に置く',
+        bonus: 80,
+        matches: (_kind, x) => Math.abs(x - WORLD.tableCenterX) <= 56,
+    },
+    {
+        key: 'edge',
+        label: '端攻め',
+        hint: '左端か右端に置く',
+        bonus: 120,
+        matches: (_kind, x) => x <= PLACEMENT.minX + 64 || x >= PLACEMENT.maxX - 64,
+    },
+    {
+        key: 'risky',
+        label: '難物チャレンジ',
+        hint: '丸い・細い雑貨を置く',
+        bonus: 100,
+        matches: (kind) => ['can', 'tape', 'ruler', 'mug', 'battery', 'marker', 'glue', 'scissors', 'dice', 'clip', 'key', 'watch', 'card', 'headphones', 'earphoneJack'].includes(kind?.shape),
+    },
+]
+
+const PARTY_EVENTS = [
+    {
+        key: 'standard',
+        label: '通常ラウンド',
+        hint: 'お題を狙う',
+    },
+    {
+        key: 'double',
+        label: 'ダブル点',
+        hint: '成功点 x2',
+        scoreMultiplier: 2,
+    },
+    {
+        key: 'edgeRush',
+        label: '端攻め祭り',
+        hint: '端置き +90',
+        edgeBonus: 90,
+    },
+    {
+        key: 'comeback',
+        label: '逆転チャンス',
+        hint: '最下位成功 +90',
+        comebackBonus: 90,
+    },
+    {
+        key: 'danger',
+        label: '高難度ボーナス',
+        hint: '難物成功 +100',
+        riskyBonus: 100,
+        angleJitterBonus: 0.035,
+    },
+]
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
 const pick = (items) => items[Math.floor(Math.random() * items.length)]
+
+function getPlacementRatio(x) {
+    return (clamp(x, PLACEMENT.minX, PLACEMENT.maxX) - PLACEMENT.minX) / (PLACEMENT.maxX - PLACEMENT.minX)
+}
+
+function getPlacementLabel(x) {
+    const ratio = getPlacementRatio(x)
+    if (ratio < 0.12) return '左端'
+    if (ratio < 0.38) return '左寄り'
+    if (ratio < 0.62) return '中央'
+    if (ratio < 0.88) return '右寄り'
+    return '右端'
+}
+
+function isEdgePlacement(x) {
+    return x <= PLACEMENT.minX + 64 || x >= PLACEMENT.maxX - 64
+}
+
+function isRiskyKind(kind) {
+    return ['can', 'tape', 'ruler', 'mug', 'battery', 'marker', 'glue', 'scissors', 'dice', 'clip', 'key', 'watch', 'card', 'headphones', 'earphoneJack'].includes(kind?.shape)
+}
+
+function getTimingGrade(distance) {
+    if (distance <= TIMING.perfectRange) {
+        return { key: 'perfect', label: 'PERFECT', bonus: TIMING.perfectBonus, color: 0xffd65f }
+    }
+    if (distance <= TIMING.goodRange) {
+        return { key: 'good', label: 'GOOD', bonus: TIMING.goodBonus, color: 0x4ec778 }
+    }
+    return { key: 'late', label: 'LATE', bonus: 0, color: 0xef5947 }
+}
 
 function uniqueChoices(pool, count) {
     const copy = [...pool]
@@ -116,21 +352,31 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.currentPlayerIndex = 0
         this.currentChoices = []
         this.selectedChoiceIndex = 0
-        this.selectedLaneIndex = 2
+        this.selectedPlaceX = WORLD.tableCenterX
         this.phase = 'boot'
         this.hp = []
         this.alive = []
         this.successes = []
         this.misses = []
+        this.scorePoints = []
+        this.streaks = []
+        this.boostAvailable = []
+        this.boostArmed = false
+        this.lastBoostUsed = false
         this.turnNumber = 0
         this.roundNumber = 1
-        this.maxTurns = 36
+        this.maxTurns = 16
         this.items = []
         this.staticBodies = []
         this.playerViews = []
         this.choiceViews = []
         this.laneViews = []
         this.ghostView = null
+        this.timingNeedle = null
+        this.timingStartedAt = 0
+        this.lastTimingState = null
+        this.targetPlaceX = WORLD.tableCenterX
+        this.turnSplash = null
         this.currentDroppingItem = null
         this.messageText = null
         this.hintText = null
@@ -139,17 +385,33 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.stableSince = null
         this.inputLockedUntil = 0
         this.keyHandlers = null
+        this.windowKeyHandler = null
         this.difficultyConfig = DIFFICULTY_CONFIG.normal
+        this.pendingMessageAction = null
+        this.currentChallenge = CHALLENGES[0]
+        this.currentPartyEvent = PARTY_EVENTS[0]
+        this.lastRoundDropLabel = ''
     }
 
     preload() {
-        Object.keys(ITEM_KINDS).forEach((key) => {
-            this.load.image(`item-${key}`, `/assets/images/items/${key}.png`)
+        Object.values(ITEM_KINDS).forEach((kind) => {
+            if (kind.noAsset) return
+            this.load.image(`item-${kind.key}`, `/assets/item_${kind.key}.png`)
         })
         for (let index = 1; index <= 4; index += 1) {
-            this.load.image(`robot-p${index}`, `/assets/images/characters/robot_p${index}.png`)
+            this.load.image(`robot-p${index}`, `/assets/char_robot_p${index}.png`)
         }
-        this.load.image('ui-controls-hint', '/assets/images/ui/controls_hint.png')
+        this.load.image('ui-controls-hint', '/assets/ui_controls_hint.png')
+        this.load.image('ui-stamp-safe', '/assets/ui_stamp_safe.png')
+        this.load.image('ui-stamp-miss', '/assets/ui_stamp_miss.png')
+        this.load.image('ui-turn-plate', '/assets/ui_turn_plate.png')
+        this.load.image('ui-drop-icon', '/assets/ui_drop_icon.png')
+        this.load.audio('se-place', '/assets/se_place.wav')
+        this.load.audio('se-safe', '/assets/se_safe.wav')
+        this.load.audio('se-miss', '/assets/se_miss.wav')
+        this.load.audio('se-turn', '/assets/se_turn.wav')
+        this.load.audio('se-select', '/assets/se_select.wav')
+        this.load.audio('se-lane', '/assets/se_lane.wav')
     }
 
     create() {
@@ -161,6 +423,11 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.alive = Array(this.playerCount).fill(true)
         this.successes = Array(this.playerCount).fill(0)
         this.misses = Array(this.playerCount).fill(0)
+        this.scorePoints = Array(this.playerCount).fill(0)
+        this.streaks = Array(this.playerCount).fill(0)
+        this.boostAvailable = Array(this.playerCount).fill(true)
+        this.boostArmed = false
+        this.lastBoostUsed = false
         this.turnNumber = 0
         this.roundNumber = 1
         this.phase = 'select'
@@ -174,8 +441,16 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.createHudTexts()
         this.registerExternalCommands()
         this.registerKeyboard()
+        this.sfx = {
+            place: this.sound.add('se-place', { volume: 0.55 }),
+            safe: this.sound.add('se-safe', { volume: 0.6 }),
+            miss: this.sound.add('se-miss', { volume: 0.65 }),
+            turn: this.sound.add('se-turn', { volume: 0.5 }),
+            select: this.sound.add('se-select', { volume: 0.42 }),
+            lane: this.sound.add('se-lane', { volume: 0.36 }),
+        }
 
-        this.showMessage('雑貨つみタワー', '1人1個ずつ置いて、崩した人がHP-1！')
+        this.showMessage('デスクつみタワー', 'えらぶ → ばしょ → おく')
         this.time.delayedCall(650, () => this.beginTurn(0))
     }
 
@@ -186,7 +461,7 @@ export default class TowerCrashScene extends Phaser.Scene {
                 this.placeSelectedItem()
             }
             if (type === 'next' && this.phase === 'message') {
-                this.advanceTurn()
+                this.resolveMessage()
             }
         }
 
@@ -197,8 +472,25 @@ export default class TowerCrashScene extends Phaser.Scene {
     }
 
     registerKeyboard() {
-        const keys = this.input.keyboard?.addKeys('LEFT,RIGHT,UP,DOWN,A,D,W,S,SPACE,ENTER')
-        this.keyHandlers = keys
+        if (typeof window === 'undefined') return
+
+        this.windowKeyHandler = (event) => {
+            const key = event.key
+            const controlKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'd', 'w', 's', 'A', 'D', 'W', 'S', 'b', 'B', ' ', 'Space', 'Spacebar', 'Enter']
+            if (!controlKeys.includes(key)) return
+
+            event.preventDefault()
+            if ((key === ' ' || key === 'Space' || key === 'Spacebar' || key === 'Enter') && event.repeat) return
+            this.handleKeyboardKey(key)
+        }
+
+        window.addEventListener('keydown', this.windowKeyHandler)
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            if (this.windowKeyHandler) {
+                window.removeEventListener('keydown', this.windowKeyHandler)
+                this.windowKeyHandler = null
+            }
+        })
     }
 
     drawBackground() {
@@ -231,35 +523,35 @@ export default class TowerCrashScene extends Phaser.Scene {
 
         // choice panel on the right
         bg.fillStyle(0xfffbef, 0.95)
-        bg.fillRoundedRect(968, 86, 278, 402, 26)
+        bg.fillRoundedRect(1012, 86, 238, 402, 24)
         bg.lineStyle(5, 0x8f5d28, 1)
-        bg.strokeRoundedRect(968, 86, 278, 402, 26)
+        bg.strokeRoundedRect(1012, 86, 238, 402, 24)
         bg.fillStyle(0xffdf89, 1)
-        bg.fillRoundedRect(992, 100, 186, 34, 14)
+        bg.fillRoundedRect(1034, 100, 170, 34, 14)
         bg.lineStyle(3, 0xb57a2e, 1)
-        bg.strokeRoundedRect(992, 100, 186, 34, 14)
+        bg.strokeRoundedRect(1034, 100, 170, 34, 14)
 
         // shelf background
         bg.fillStyle(0xfff2b8, 1)
-        bg.fillRoundedRect(975, 500, 250, 96, 20)
+        bg.fillRoundedRect(1020, 500, 216, 96, 20)
         bg.lineStyle(4, 0x9b6413, 1)
-        bg.strokeRoundedRect(975, 500, 250, 96, 20)
+        bg.strokeRoundedRect(1020, 500, 216, 96, 20)
         bg.lineStyle(4, 0xc27a1d, 1)
         bg.beginPath()
-        bg.moveTo(990, 548)
-        bg.lineTo(1210, 548)
+        bg.moveTo(1034, 548)
+        bg.lineTo(1220, 548)
         bg.strokePath()
         for (let i = 0; i < 4; i += 1) {
-            const x = 1002 + i * 48
+            const x = 1042 + i * 42
             bg.fillStyle([0x4b72d9, 0xff7aa5, 0x2aa7a3, 0xf6c85f][i % 4], 1)
             bg.fillRoundedRect(x, 516 + (i % 2) * 8, 28, 28, 6)
             bg.fillStyle(0xffffff, 0.9)
             bg.fillRect(x + 5, 526 + (i % 2) * 8, 18, 5)
         }
         bg.fillStyle(0xcdd5e2, 1)
-        bg.fillRoundedRect(1180, 519, 24, 24, 6)
+        bg.fillRoundedRect(1200, 519, 24, 24, 6)
         bg.fillStyle(0xe94834, 1)
-        bg.fillRect(1184, 526, 16, 6)
+        bg.fillRect(1204, 526, 16, 6)
 
         // desk and lower floor
         bg.fillStyle(0xffe28a, 1)
@@ -272,26 +564,15 @@ export default class TowerCrashScene extends Phaser.Scene {
         bg.lineTo(1280, 620)
         bg.strokePath()
 
-        // lane guide shadows
-        LANE_OFFSETS.forEach((offset, index) => {
-            const x = WORLD.tableCenterX + offset
-            bg.fillStyle(0xffffff, 0.17)
-            bg.fillRoundedRect(x - 40, 340, 80, 214, 18)
-            bg.lineStyle(2, 0xffffff, 0.18)
-            bg.strokeRoundedRect(x - 40, 340, 80, 214, 18)
-            bg.fillStyle(0xfff6d5, 1)
-            bg.fillRoundedRect(x - 34, 552, 68, 28, 12)
-            bg.lineStyle(3, 0x8b5824, 1)
-            bg.strokeRoundedRect(x - 34, 552, 68, 28, 12)
-            this.add.text(x, 566, `${index + 1}`, {
-                fontFamily: FONT,
-                fontSize: '18px',
-                color: '#6b3a08',
-                fontStyle: 'bold',
-                stroke: '#ffffff',
-                strokeThickness: 4,
-            }).setOrigin(0.5)
-        })
+        // placement area
+        bg.fillStyle(0xffffff, 0.15)
+        bg.fillRoundedRect(PLACEMENT.minX - 42, 338, PLACEMENT.maxX - PLACEMENT.minX + 84, 218, 22)
+        bg.lineStyle(3, 0xffffff, 0.22)
+        bg.strokeRoundedRect(PLACEMENT.minX - 42, 338, PLACEMENT.maxX - PLACEMENT.minX + 84, 218, 22)
+        bg.fillStyle(0xfff6d5, 1)
+        bg.fillRoundedRect(PLACEMENT.minX - 18, 552, PLACEMENT.maxX - PLACEMENT.minX + 36, 28, 14)
+        bg.lineStyle(3, 0x8b5824, 1)
+        bg.strokeRoundedRect(PLACEMENT.minX - 18, 552, PLACEMENT.maxX - PLACEMENT.minX + 36, 28, 14)
 
         // main table
         bg.fillStyle(0xfff5c7, 1)
@@ -319,7 +600,7 @@ export default class TowerCrashScene extends Phaser.Scene {
             strokeThickness: 4,
         }).setOrigin(0.5)
 
-        this.add.text(1085, 117, 'えらべる雑貨', {
+        this.add.text(1119, 117, 'えらべる雑貨', {
             fontFamily: FONT,
             fontSize: '18px',
             color: '#8b5d24',
@@ -328,9 +609,6 @@ export default class TowerCrashScene extends Phaser.Scene {
             strokeThickness: 4,
         }).setOrigin(0.5)
 
-        this.add.image(1108, 472, 'ui-controls-hint')
-            .setDisplaySize(240, 60)
-            .setDepth(2)
     }
 
     createStageBodies() {
@@ -384,11 +662,9 @@ export default class TowerCrashScene extends Phaser.Scene {
     }
 
     createPlayerViews() {
-        const startX = 170
-        const gap = 92
         for (let index = 0; index < this.playerCount; index += 1) {
-            const x = startX + index * gap
-            const y = 673
+            const x = PLAYER_FLOOR.startX + index * PLAYER_FLOOR.gap
+            const y = PLAYER_FLOOR.y
             const view = this.createRobotAvatar(x, y, index)
             this.playerViews.push(view)
         }
@@ -401,20 +677,24 @@ export default class TowerCrashScene extends Phaser.Scene {
         shadow.fillEllipse(0, 30, 66, 15)
 
         const textureKey = `robot-p${playerIndex + 1}`
-        const body = this.textures.exists(textureKey)
+        const hasRobotTexture = this.textures.exists(textureKey)
+        const body = hasRobotTexture
             ? this.add.image(0, -8, textureKey).setDisplaySize(82, 98)
             : this.createFallbackRobotGraphic(playerIndex)
 
-        const label = this.add.text(0, 50, `P${playerIndex + 1}`, {
-            fontFamily: FONT,
-            fontSize: '19px',
-            color: '#1b1b1b',
-            fontStyle: 'bold',
-            stroke: '#ffffff',
-            strokeThickness: 4,
-        }).setOrigin(0.5)
-
-        container.add([shadow, body, label])
+        if (hasRobotTexture) {
+            container.add([shadow, body])
+        } else {
+            const label = this.add.text(0, 50, `P${playerIndex + 1}`, {
+                fontFamily: FONT,
+                fontSize: '19px',
+                color: '#1b1b1b',
+                fontStyle: 'bold',
+                stroke: '#ffffff',
+                strokeThickness: 4,
+            }).setOrigin(0.5)
+            container.add([shadow, body, label])
+        }
         return container
     }
 
@@ -422,9 +702,9 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.playerViews.forEach((view, index) => {
             const isCurrent = index === this.currentPlayerIndex && this.phase !== 'finished'
             const isAlive = this.alive[index]
-            const targetX = isCurrent ? 1020 : 170 + index * 92
-            const targetY = isCurrent ? 548 : 673
-            const scale = isCurrent ? 1.16 : 0.92
+            const targetX = PLAYER_FLOOR.startX + index * PLAYER_FLOOR.gap
+            const targetY = isCurrent ? PLAYER_FLOOR.currentY : PLAYER_FLOOR.y
+            const scale = isCurrent ? 1.08 : 0.9
             const alpha = isAlive ? 1 : 0.42
 
             this.tweens.killTweensOf(view)
@@ -452,22 +732,69 @@ export default class TowerCrashScene extends Phaser.Scene {
         const nextIndex = this.findNextAlivePlayer(preferredIndex)
         this.currentPlayerIndex = nextIndex
         this.phase = 'select'
+        this.pendingMessageAction = null
         this.selectedChoiceIndex = 0
-        this.selectedLaneIndex = 2
+        this.selectedPlaceX = WORLD.tableCenterX
         this.currentDroppingItem = null
         this.stableSince = null
         this.inputLockedUntil = this.time.now + 240
+        this.boostArmed = false
+        this.lastBoostUsed = false
+        this.timingStartedAt = this.time.now
+        this.lastTimingState = null
+        this.targetPlaceX = Phaser.Math.Between(PLACEMENT.minX + 40, PLACEMENT.maxX - 40)
         this.turnNumber += 1
         this.roundNumber = Math.floor((this.turnNumber - 1) / Math.max(1, this.playerCount)) + 1
 
         this.currentChoices = uniqueChoices(this.difficultyConfig.cardPool, 3)
-        this.showMessage(`P${nextIndex + 1} の番`, '置く雑貨を選んで、置き場所を決めてね')
+        const challengePool = CHALLENGES.filter((challenge) => (
+            challenge.key !== 'risky'
+            || this.currentChoices.some((kind) => challenge.matches(kind, this.selectedPlaceX))
+        ))
+        this.currentChallenge = pick(challengePool)
+        const startsRound = (this.turnNumber - 1) % Math.max(1, this.playerCount) === 0
+        if (startsRound) {
+            this.currentPartyEvent = PARTY_EVENTS[(this.roundNumber - 1) % PARTY_EVENTS.length]
+        }
+        this.sfx?.turn?.play()
+        this.showMessage(`P${nextIndex + 1} の番`, `${this.currentPartyEvent.label} / ${this.currentChallenge.label}`)
         this.turnText?.setText(`TURN ${this.turnNumber}/${this.maxTurns}`)
         this.createChoiceCards()
         this.createLaneButtons()
         this.createGhostView()
         this.updatePlayerViews()
+        this.showTurnSplash(nextIndex)
+        if (startsRound && this.roundNumber >= ROUND_DROP.enabledFromRound) {
+            this.dropRoundObstacle()
+        }
         this.dispatchHud(false)
+    }
+
+    dropRoundObstacle() {
+        const count = Math.min(ROUND_DROP.maxCount, ROUND_DROP.baseCount + Math.max(0, this.roundNumber - 3))
+        const labels = []
+        for (let index = 0; index < count; index += 1) {
+            const kind = ITEM_KINDS[pick(ROUND_DROP.pool)]
+            if (!kind) continue
+            const x = Phaser.Math.Between(PLACEMENT.minX + 34, PLACEMENT.maxX - 34)
+            const y = 112 - index * 34
+            const angle = Phaser.Math.FloatBetween(-0.5, 0.5)
+            const item = this.createPlacedItem(x, y, kind, angle, {
+                owner: null,
+                neutral: true,
+                depth: 18,
+                scale: this.getRoundItemScale() * 0.95,
+            })
+            MATTER.Body.setAngularVelocity(item.body, Phaser.Math.FloatBetween(-0.04, 0.04))
+            MATTER.Body.applyForce(item.body, item.body.position, {
+                x: Phaser.Math.FloatBetween(-0.0012, 0.0012),
+                y: 0.0013 + index * 0.0002,
+            })
+            labels.push(kind.label)
+            this.showPlaceBurst(x, y + 28, 0xffd65f)
+        }
+        this.lastRoundDropLabel = labels.length > 1 ? `${labels.length}個` : labels[0] ?? ''
+        this.showMessage('ROUND DROP!', `${this.lastRoundDropLabel} 落下`)
     }
 
     findNextAlivePlayer(startIndex) {
@@ -488,25 +815,25 @@ export default class TowerCrashScene extends Phaser.Scene {
 
     createChoiceCards() {
         this.destroyChoiceCards()
-        const startX = 1108
-        const startY = 182
+        const startX = 1130
+        const startY = 194
         this.currentChoices.forEach((kind, index) => {
-            const y = startY + index * 110
+            const y = startY + index * 112
             const selected = index === this.selectedChoiceIndex
             const card = this.add.container(startX, y).setDepth(35)
             const bg = this.add.graphics()
             bg.fillStyle(selected ? 0xfff1a6 : 0xffffff, 0.97)
-            bg.fillRoundedRect(-122, -44, 244, 88, 20)
+            bg.fillRoundedRect(-108, -40, 216, 80, 18)
             bg.lineStyle(5, selected ? PLAYER_COLORS[this.currentPlayerIndex] : 0xc1914f, 1)
-            bg.strokeRoundedRect(-122, -44, 244, 88, 20)
+            bg.strokeRoundedRect(-108, -40, 216, 80, 18)
             bg.fillStyle(0x000000, 0.08)
-            bg.fillRoundedRect(-110, 30, 220, 7, 6)
+            bg.fillRoundedRect(-96, 26, 192, 7, 6)
             bg.fillStyle(selected ? PLAYER_COLORS[this.currentPlayerIndex] : 0xffdf89, 1)
-            bg.fillRoundedRect(-109, -32, 32, 32, 12)
+            bg.fillRoundedRect(-95, -28, 32, 32, 12)
             bg.lineStyle(3, 0x8f5d28, 0.65)
-            bg.strokeRoundedRect(-109, -32, 32, 32, 12)
+            bg.strokeRoundedRect(-95, -28, 32, 32, 12)
 
-            const numberText = this.add.text(-93, -16, `${index + 1}`, {
+            const numberText = this.add.text(-79, -12, `${index + 1}`, {
                 fontFamily: FONT,
                 fontSize: '20px',
                 color: selected ? '#ffffff' : '#6b3a08',
@@ -515,39 +842,34 @@ export default class TowerCrashScene extends Phaser.Scene {
                 strokeThickness: 4,
             }).setOrigin(0.5)
 
-            const sample = this.add.container(-64, 2)
-            const preview = this.createItemDisplay(kind, 0.98)
+            const sample = this.add.container(-44, 0)
+            const preview = this.createItemDisplay(kind, 1.02)
             sample.add(preview)
-            sample.setScale(0.58)
+            sample.setScale(0.56)
 
-            const label = this.add.text(-10, -16, kind.label, {
+            const label = this.add.text(0, 0, kind.label, {
                 fontFamily: FONT,
-                fontSize: '24px',
+                fontSize: '25px',
                 color: '#1b1b1b',
                 fontStyle: 'bold',
                 stroke: '#ffffff',
                 strokeThickness: 4,
             }).setOrigin(0, 0.5)
-            const desc = this.add.text(-10, 14, kind.description, {
-                fontFamily: FONT,
-                fontSize: '14px',
-                color: '#6b3a08',
-                fontStyle: 'bold',
-                stroke: '#ffffff',
-                strokeThickness: 3,
-                wordWrap: { width: 150, useAdvancedWrap: true },
-            }).setOrigin(0, 0.5)
 
-            card.add([bg, numberText, sample, label, desc])
-            card.setSize(244, 88)
-            card.setInteractive(new Phaser.Geom.Rectangle(-122, -44, 244, 88), Phaser.Geom.Rectangle.Contains)
-            card.on('pointerdown', () => {
-                if (this.phase !== 'select') return
-                this.selectedChoiceIndex = index
-                this.createChoiceCards()
-                this.createGhostView()
-                this.dispatchHud(false)
-            })
+            card.add([bg, numberText, sample, label])
+            card.setSize(216, 80)
+            if (selected) {
+                card.setScale(1.06)
+                this.tweens.add({
+                    targets: card,
+                    scaleX: 1.09,
+                    scaleY: 1.09,
+                    duration: 420,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut',
+                })
+            }
             this.choiceViews.push(card)
         })
     }
@@ -559,60 +881,85 @@ export default class TowerCrashScene extends Phaser.Scene {
 
     createLaneButtons() {
         this.destroyLaneButtons()
-        LANE_OFFSETS.forEach((offset, index) => {
-            const x = WORLD.tableCenterX + offset
-            const y = WORLD.tableTopY - 18
-            const lane = this.add.container(x, y).setDepth(31)
-            const g = this.add.graphics()
-            const selected = index === this.selectedLaneIndex
-            g.fillStyle(selected ? PLAYER_COLORS[this.currentPlayerIndex] : 0xffffff, selected ? 0.18 : 0.08)
-            g.fillRoundedRect(-45, -212, 90, 220, 18)
-            g.lineStyle(selected ? 5 : 2, selected ? PLAYER_COLORS[this.currentPlayerIndex] : 0xffffff, selected ? 1 : 0.3)
-            g.strokeRoundedRect(-45, -212, 90, 220, 18)
-            g.fillStyle(selected ? PLAYER_COLORS[this.currentPlayerIndex] : 0xfff6d5, 1)
-            g.fillRoundedRect(-38, 9, 76, 34, 14)
-            g.lineStyle(3, 0x7b4a18, 0.8)
-            g.strokeRoundedRect(-38, 9, 76, 34, 14)
-            g.fillStyle(selected ? PLAYER_COLORS[this.currentPlayerIndex] : 0xffffff, selected ? 0.96 : 0.7)
-            g.fillRoundedRect(-18, -194, 36, 22, 10)
-            g.lineStyle(2, 0x7b4a18, 0.35)
-            g.strokeRoundedRect(-18, -194, 36, 22, 10)
-            const laneLabel = this.add.text(0, -183, 'DROP', {
-                fontFamily: FONT,
-                fontSize: '10px',
-                color: selected ? '#ffffff' : '#6b3a08',
-                fontStyle: 'bold',
-            }).setOrigin(0.5)
-            const t = this.add.text(0, 26, `${index + 1}`, {
-                fontFamily: FONT,
-                fontSize: '20px',
-                color: selected ? '#ffffff' : '#6b3a08',
-                fontStyle: 'bold',
-                stroke: selected ? '#7b4a18' : '#ffffff',
-                strokeThickness: 4,
-            }).setOrigin(0.5)
-            lane.add([g, laneLabel, t])
-            lane.setSize(96, 245)
-            lane.setInteractive(new Phaser.Geom.Rectangle(-48, -212, 96, 245), Phaser.Geom.Rectangle.Contains)
-            lane.on('pointerdown', () => {
-                if (this.phase !== 'select') return
-                this.selectedLaneIndex = index
-                this.createLaneButtons()
-                this.createGhostView()
-                this.dispatchHud(false)
-            })
-            lane.on('pointerup', () => {
-                if (this.phase !== 'select') return
-                this.selectedLaneIndex = index
-                this.placeSelectedItem()
-            })
-            this.laneViews.push(lane)
-        })
+        const width = PLACEMENT.maxX - PLACEMENT.minX
+        const railY = WORLD.tableTopY + 18
+        const rail = this.add.container(PLACEMENT.minX, railY).setDepth(31)
+        const g = this.add.graphics()
+        g.fillStyle(0xffffff, 0.58)
+        g.fillRoundedRect(-18, -22, width + 36, 44, 18)
+        g.lineStyle(4, 0x8b5824, 0.9)
+        g.strokeRoundedRect(-18, -22, width + 36, 44, 18)
+        g.fillStyle(0xf6c85f, 1)
+        g.fillRoundedRect(0, -5, width, 10, 6)
+
+        const targetX = this.targetPlaceX - PLACEMENT.minX
+        g.fillStyle(0xffd65f, 0.9)
+        g.fillRoundedRect(targetX - 24, -18, 48, 36, 14)
+        g.lineStyle(4, 0xffffff, 0.95)
+        g.strokeRoundedRect(targetX - 24, -18, 48, 36, 14)
+        g.fillStyle(0xef5947, 1)
+        g.fillCircle(targetX, 0, 6)
+
+        const cursorX = this.selectedPlaceX - PLACEMENT.minX
+        const cursor = this.add.graphics()
+        cursor.fillStyle(PLAYER_COLORS[this.currentPlayerIndex], 1)
+        cursor.fillRoundedRect(cursorX - 38, -24, 76, 48, 16)
+        cursor.lineStyle(4, 0xffffff, 0.95)
+        cursor.strokeRoundedRect(cursorX - 38, -24, 76, 48, 16)
+
+        const label = this.add.text(cursorX, 0, getPlacementLabel(this.selectedPlaceX), {
+            fontFamily: FONT,
+            fontSize: '16px',
+            color: '#ffffff',
+            fontStyle: 'bold',
+            stroke: '#7b4a18',
+            strokeThickness: 4,
+        }).setOrigin(0.5)
+
+        const hint = this.add.text(width / 2, -48, '← → 位置 / SPACE タイミング', {
+            fontFamily: FONT,
+            fontSize: '18px',
+            color: '#6b3a08',
+            fontStyle: 'bold',
+            stroke: '#ffffff',
+            strokeThickness: 4,
+        }).setOrigin(0.5)
+
+        const timing = this.add.container(width / 2, -132)
+        const timingBg = this.add.graphics()
+        timingBg.fillStyle(0xffffff, 0.82)
+        timingBg.fillRoundedRect(-TIMING.barWidth / 2 - 12, -18, TIMING.barWidth + 24, 36, 16)
+        timingBg.lineStyle(3, 0x8f5d28, 0.9)
+        timingBg.strokeRoundedRect(-TIMING.barWidth / 2 - 12, -18, TIMING.barWidth + 24, 36, 16)
+        timingBg.fillStyle(0xef5947, 0.35)
+        timingBg.fillRoundedRect(-TIMING.barWidth / 2, -6, TIMING.barWidth, 12, 6)
+        timingBg.fillStyle(0x4ec778, 0.72)
+        timingBg.fillRoundedRect(-TIMING.barWidth * TIMING.goodRange, -8, TIMING.barWidth * TIMING.goodRange * 2, 16, 8)
+        timingBg.fillStyle(0xffd65f, 1)
+        timingBg.fillRoundedRect(-TIMING.barWidth * TIMING.perfectRange, -11, TIMING.barWidth * TIMING.perfectRange * 2, 22, 9)
+
+        const timingText = this.add.text(0, -31, 'TIMING', {
+            fontFamily: FONT,
+            fontSize: '16px',
+            color: '#6b3a08',
+            fontStyle: 'bold',
+            stroke: '#ffffff',
+            strokeThickness: 4,
+        }).setOrigin(0.5)
+
+        const needle = this.add.graphics()
+        timing.add([timingBg, timingText, needle])
+        this.timingNeedle = needle
+
+        rail.add([g, cursor, label, hint, timing])
+        this.laneViews.push(rail)
+        this.syncTimingGauge()
     }
 
     destroyLaneButtons() {
         this.laneViews.forEach((view) => view.destroy())
         this.laneViews = []
+        this.timingNeedle = null
     }
 
     createGhostView() {
@@ -620,7 +967,7 @@ export default class TowerCrashScene extends Phaser.Scene {
         if (this.phase !== 'select') return
         const kind = this.currentChoices[this.selectedChoiceIndex]
         if (!kind) return
-        const x = WORLD.tableCenterX + LANE_OFFSETS[this.selectedLaneIndex]
+        const x = this.selectedPlaceX
         const y = this.getSpawnY() + 38
         this.ghostView = this.add.container(x, y).setDepth(32).setAlpha(0.64)
         const preview = this.createItemDisplay(kind, 1.04)
@@ -653,6 +1000,12 @@ export default class TowerCrashScene extends Phaser.Scene {
         if (!kind) return
 
         this.phase = 'settling'
+        this.lastTimingState = this.getTimingState()
+        this.lastBoostUsed = this.boostArmed && this.boostAvailable[this.currentPlayerIndex]
+        if (this.lastBoostUsed) {
+            this.boostAvailable[this.currentPlayerIndex] = false
+        }
+        this.boostArmed = false
         this.destroyChoiceCards()
         this.destroyLaneButtons()
         this.ghostView?.destroy()
@@ -660,14 +1013,29 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.stableSince = null
         this.dropStartedAt = this.time.now
 
-        const x = WORLD.tableCenterX + LANE_OFFSETS[this.selectedLaneIndex]
+        const x = this.selectedPlaceX
         const y = this.getSpawnY()
-        const angleJitter = runtimeSettings.difficulty === 'hard'
-            ? Phaser.Math.FloatBetween(-0.08, 0.08)
-            : Phaser.Math.FloatBetween(-0.045, 0.045)
-        const item = this.createPlacedItem(x, y, kind, angleJitter)
+        const timingPenalty = this.lastTimingState?.key === 'late' ? TIMING.badAnglePenalty : 0
+        const angleJitterRange = this.difficultyConfig.angleJitter + (this.currentPartyEvent?.angleJitterBonus ?? 0) + timingPenalty
+        const angleJitter = Phaser.Math.FloatBetween(
+            -angleJitterRange,
+            angleJitterRange
+        )
+        this.showPlaceBurst(x, y + 24, PLAYER_COLORS[this.currentPlayerIndex])
+        const item = this.createPlacedItem(x, y, kind, angleJitter, {
+            scale: this.getRoundItemScale(),
+        })
+        if (this.lastTimingState?.key === 'late') {
+            const spinDirection = x < WORLD.tableCenterX ? -1 : 1
+            MATTER.Body.setAngularVelocity(item.body, TIMING.badSpin * spinDirection)
+            MATTER.Body.applyForce(item.body, item.body.position, {
+                x: 0.0009 * spinDirection,
+                y: 0,
+            })
+        }
         this.currentDroppingItem = item
-        this.showMessage(`${kind.label} を置いた！`, 'グラグラが止まるまで見守ってね')
+        this.sfx?.place?.play()
+        this.showMessage(`${this.lastTimingState?.label ?? 'DROP'}!`, `${kind.label} を置いた`)
         this.dispatchHud(false)
 
         const robot = this.playerViews[this.currentPlayerIndex]
@@ -676,44 +1044,101 @@ export default class TowerCrashScene extends Phaser.Scene {
         }
     }
 
-    createPlacedItem(x, y, kind, angle = 0) {
+    getRoundItemScale() {
+        return Math.min(ROUND_SCALE.max, 1 + Math.max(0, this.roundNumber - 1) * ROUND_SCALE.step)
+    }
+
+    createPlacedItem(x, y, kind, angle = 0, meta = {}) {
+        const itemScale = meta.scale ?? 1
         const options = {
             friction: kind.friction ?? 0.8,
             frictionStatic: kind.frictionStatic ?? 0.6,
             restitution: kind.restitution ?? 0.02,
             density: kind.density ?? 0.0035,
-            frictionAir: 0.002,
+            frictionAir: this.difficultyConfig.frictionAir,
         }
-        let body
-        if (kind.shape === 'can' || kind.shape === 'tape') {
-            body = MATTER.Bodies.circle(x, y, kind.radius, options)
-        } else {
-            body = MATTER.Bodies.rectangle(x, y, kind.width, kind.height, {
-                ...options,
-                chamfer: { radius: ['box', 'mug', 'battery'].includes(kind.shape) ? 8 : 5 },
-            })
+        const scaledKind = {
+            ...kind,
+            width: kind.width ? kind.width * itemScale : kind.width,
+            height: kind.height ? kind.height * itemScale : kind.height,
+            radius: kind.radius ? kind.radius * itemScale : kind.radius,
         }
+        const body = this.createItemBody(x, y, scaledKind, options)
         this.matter.world.add(body)
         MATTER.Body.setAngle(body, angle)
 
-        const view = this.add.container(x, y).setDepth(20)
+        const view = this.add.container(x, y).setDepth(meta.depth ?? 20)
         const shadow = this.add.graphics()
         shadow.fillStyle(0x000000, 0.12)
-        shadow.fillEllipse(0, (kind.height ?? kind.radius * 2) / 2 + 7, (kind.width ?? kind.radius * 2) * 0.75, 8)
+        shadow.fillEllipse(0, (scaledKind.height ?? scaledKind.radius * 2) / 2 + 7, (scaledKind.width ?? scaledKind.radius * 2) * 0.75, 8)
         const itemImage = this.createItemDisplay(kind, 1.08)
-        const label = this.add.text(0, (kind.height ?? kind.radius * 2) / 2 + 18, kind.label, {
-            fontFamily: FONT,
-            fontSize: '13px',
-            color: '#5d370a',
-            fontStyle: 'bold',
-            stroke: '#ffffff',
-            strokeThickness: 3,
-        }).setOrigin(0.5)
-        view.add([shadow, itemImage, label])
+        view.add([shadow, itemImage])
+        view.setScale(itemScale)
 
-        const item = { body, view, kind, owner: this.currentPlayerIndex, safe: false }
+        const item = {
+            body,
+            view,
+            kind,
+            owner: meta.owner ?? this.currentPlayerIndex,
+            neutral: Boolean(meta.neutral),
+            safe: false,
+        }
         this.items.push(item)
         return item
+    }
+
+    createItemBody(x, y, kind, options) {
+        if (['can', 'tape', 'watch'].includes(kind.shape)) {
+            return MATTER.Bodies.circle(x, y, kind.radius ?? (kind.width / 2), options)
+        }
+
+        if (kind.shape === 'key') {
+            const ring = MATTER.Bodies.circle(x - 24, y, 12, options)
+            const shaft = MATTER.Bodies.rectangle(x + 12, y, 54, 10, options)
+            const tooth = MATTER.Bodies.rectangle(x + 28, y + 8, 16, 10, options)
+            return MATTER.Body.create({ parts: [ring, shaft, tooth], ...options })
+        }
+
+        if (kind.shape === 'scissors') {
+            const bladeA = MATTER.Bodies.rectangle(x + 12, y, 82, 8, options)
+            const bladeB = MATTER.Bodies.rectangle(x + 12, y, 82, 8, options)
+            MATTER.Body.setAngle(bladeA, 0.34)
+            MATTER.Body.setAngle(bladeB, -0.34)
+            const handleA = MATTER.Bodies.circle(x - 34, y - 10, 11, options)
+            const handleB = MATTER.Bodies.circle(x - 34, y + 10, 11, options)
+            return MATTER.Body.create({ parts: [bladeA, bladeB, handleA, handleB], ...options })
+        }
+
+        if (kind.shape === 'headphones') {
+            const left = MATTER.Bodies.rectangle(x - 28, y + 8, 18, 28, options)
+            const right = MATTER.Bodies.rectangle(x + 28, y + 8, 18, 28, options)
+            const bridge = MATTER.Bodies.rectangle(x, y - 12, 62, 8, {
+                ...options,
+                chamfer: { radius: 6 },
+            })
+            return MATTER.Body.create({ parts: [left, right, bridge], ...options })
+        }
+
+        if (kind.shape === 'clip') {
+            const outer = MATTER.Bodies.rectangle(x, y, kind.width, 8, options)
+            const inner = MATTER.Bodies.rectangle(x, y + 8, kind.width - 22, 7, options)
+            return MATTER.Body.create({ parts: [outer, inner], ...options })
+        }
+
+        if (kind.shape === 'earphoneJack') {
+            const cable = MATTER.Bodies.rectangle(x - 18, y, 68, 7, options)
+            const plug = MATTER.Bodies.rectangle(x + 25, y, 26, 14, options)
+            const tip = MATTER.Bodies.circle(x + 43, y, 7, {
+                ...options,
+                density: (options.density ?? 0.0035) * 1.5,
+            })
+            return MATTER.Body.create({ parts: [cable, plug, tip], ...options })
+        }
+
+        return MATTER.Bodies.rectangle(x, y, kind.width, kind.height, {
+            ...options,
+            chamfer: { radius: ['box', 'mug', 'battery', 'dice'].includes(kind.shape) ? 8 : 5 },
+        })
     }
 
     createItemDisplay(kind, scale = 1) {
@@ -795,7 +1220,7 @@ export default class TowerCrashScene extends Phaser.Scene {
             return
         }
 
-        const radius = kind.shape === 'book' ? 4 : kind.shape === 'ruler' ? 3 : 8
+        const radius = kind.shape === 'book' ? 4 : ['ruler', 'marker', 'clip', 'card'].includes(kind.shape) ? 3 : 8
         graphics.fillStyle(kind.color, 1)
         graphics.fillRoundedRect(-halfW, -halfH, w, h, radius)
         graphics.lineStyle(4, 0x262626, 1)
@@ -853,12 +1278,125 @@ export default class TowerCrashScene extends Phaser.Scene {
             graphics.fillRoundedRect(-10, -halfH - 6, 20, 8, 3)
             graphics.fillStyle(0xffffff, 1)
             graphics.fillRect(-7, halfH - 15, 14, 3)
+        } else if (kind.shape === 'marker') {
+            graphics.fillStyle(kind.accent, 1)
+            graphics.fillRoundedRect(-halfW + 8, -halfH + 4, 20, h - 8, 4)
+            graphics.fillStyle(0x252525, 1)
+            graphics.fillRect(halfW - 12, -halfH + 4, 5, h - 8)
+        } else if (kind.shape === 'glue') {
+            graphics.fillStyle(kind.accent, 1)
+            graphics.fillRoundedRect(-halfW + 6, -halfH + 10, w - 12, 20, 6)
+            graphics.fillStyle(0xf4f1de, 1)
+            graphics.fillRoundedRect(-halfW + 8, halfH - 22, w - 16, 14, 5)
+        } else if (kind.shape === 'stapler') {
+            graphics.fillStyle(kind.accent, 0.9)
+            graphics.fillRoundedRect(-halfW + 8, -halfH + 8, w - 16, 10, 5)
+            graphics.lineStyle(3, 0x252525, 1)
+            graphics.beginPath()
+            graphics.moveTo(-halfW + 8, halfH - 8)
+            graphics.lineTo(halfW - 10, -halfH + 8)
+            graphics.strokePath()
+        } else if (kind.shape === 'scissors') {
+            graphics.clear()
+            graphics.lineStyle(8, kind.color, 1)
+            graphics.beginPath()
+            graphics.moveTo(-halfW + 26, -halfH + 8)
+            graphics.lineTo(halfW - 8, halfH - 8)
+            graphics.moveTo(-halfW + 26, halfH - 8)
+            graphics.lineTo(halfW - 8, -halfH + 8)
+            graphics.strokePath()
+            graphics.fillStyle(kind.accent, 1)
+            graphics.fillCircle(-halfW + 14, -9, 12)
+            graphics.fillCircle(-halfW + 14, 9, 12)
+            graphics.fillStyle(0xffffff, 1)
+            graphics.fillCircle(-halfW + 14, -9, 6)
+            graphics.fillCircle(-halfW + 14, 9, 6)
+        } else if (kind.shape === 'phone') {
+            graphics.fillStyle(kind.accent, 0.35)
+            graphics.fillRoundedRect(-halfW + 7, -halfH + 6, w - 14, h - 12, 6)
+            graphics.fillStyle(0xffffff, 0.85)
+            graphics.fillCircle(0, halfH - 7, 3)
+        } else if (kind.shape === 'dice') {
+            graphics.fillStyle(kind.accent, 1)
+            const dots = [[-12, -12], [0, 0], [12, 12], [12, -12], [-12, 12]]
+            dots.forEach(([x, y]) => {
+                graphics.fillCircle(x, y, 3)
+            })
+        } else if (kind.shape === 'clip') {
+            graphics.clear()
+            graphics.lineStyle(8, kind.color, 1)
+            graphics.strokeRoundedRect(-halfW + 8, -halfH + 4, w - 16, h - 8, 10)
+            graphics.lineStyle(4, kind.accent, 1)
+            graphics.strokeRoundedRect(-halfW + 18, -halfH + 8, w - 36, h - 16, 7)
+        } else if (kind.shape === 'key') {
+            graphics.clear()
+            graphics.lineStyle(8, kind.color, 1)
+            graphics.beginPath()
+            graphics.moveTo(-halfW + 23, 0)
+            graphics.lineTo(halfW - 9, 0)
+            graphics.moveTo(halfW - 20, 0)
+            graphics.lineTo(halfW - 20, 9)
+            graphics.moveTo(halfW - 8, 0)
+            graphics.lineTo(halfW - 8, 12)
+            graphics.strokePath()
+            graphics.lineStyle(6, kind.accent, 1)
+            graphics.strokeCircle(-halfW + 14, 0, 12)
+            graphics.fillStyle(0xffffff, 1)
+            graphics.fillCircle(-halfW + 14, 0, 5)
+        } else if (kind.shape === 'watch') {
+            graphics.clear()
+            graphics.fillStyle(kind.color, 1)
+            graphics.fillRoundedRect(-12, -halfH, 24, h, 8)
+            graphics.fillCircle(0, 0, 22)
+            graphics.lineStyle(4, 0x262626, 1)
+            graphics.strokeCircle(0, 0, 22)
+            graphics.fillStyle(kind.accent, 1)
+            graphics.fillCircle(0, 0, 14)
+            graphics.lineStyle(3, kind.color, 1)
+            graphics.beginPath()
+            graphics.moveTo(0, 0)
+            graphics.lineTo(0, -9)
+            graphics.moveTo(0, 0)
+            graphics.lineTo(8, 4)
+            graphics.strokePath()
+        } else if (kind.shape === 'card') {
+            graphics.fillStyle(kind.accent, 1)
+            graphics.fillRoundedRect(-halfW + 8, -halfH + 4, 20, h - 8, 4)
+            graphics.fillStyle(0x4bb7ff, 1)
+            graphics.fillRoundedRect(halfW - 28, -halfH + 4, 20, h - 8, 4)
+        } else if (kind.shape === 'headphones') {
+            graphics.clear()
+            graphics.lineStyle(8, kind.color, 1)
+            graphics.beginPath()
+            graphics.arc(0, 5, 30, Math.PI, Math.PI * 2)
+            graphics.strokePath()
+            graphics.fillStyle(kind.color, 1)
+            graphics.fillRoundedRect(-halfW + 8, 0, 20, 28, 8)
+            graphics.fillRoundedRect(halfW - 28, 0, 20, 28, 8)
+            graphics.fillStyle(kind.accent, 1)
+            graphics.fillCircle(-halfW + 18, 10, 5)
+            graphics.fillCircle(halfW - 18, 10, 5)
+        } else if (kind.shape === 'earphoneJack') {
+            graphics.clear()
+            graphics.lineStyle(7, kind.color, 1)
+            graphics.beginPath()
+            graphics.moveTo(-halfW + 8, 0)
+            graphics.lineTo(halfW - 22, 0)
+            graphics.strokePath()
+            graphics.fillStyle(kind.accent, 1)
+            graphics.fillRoundedRect(halfW - 30, -8, 22, 16, 5)
+            graphics.fillStyle(0x2f3a4a, 1)
+            graphics.fillRoundedRect(halfW - 10, -5, 18, 10, 4)
+            graphics.fillStyle(0xe8edf4, 1)
+            graphics.fillCircle(halfW + 10, 0, 6)
         }
 
     }
 
     update() {
         this.syncItemViews()
+        this.cleanupNeutralObstacles()
+        this.syncTimingGauge()
         this.handleKeyboardInput()
 
         if (this.phase === 'settling') {
@@ -874,28 +1412,84 @@ export default class TowerCrashScene extends Phaser.Scene {
         }
     }
 
+    cleanupNeutralObstacles() {
+        const keep = []
+        for (const item of this.items) {
+            if (item.neutral && item.body && (
+                item.body.position.y > WORLD.groundY + 120
+                || item.body.position.x < -120
+                || item.body.position.x > WORLD.width + 120
+            )) {
+                this.matter.world.remove(item.body)
+                item.view?.destroy()
+            } else {
+                keep.push(item)
+            }
+        }
+        this.items = keep
+    }
+
+    getTimingState() {
+        const elapsed = Math.max(0, this.time.now - this.timingStartedAt)
+        const phase = (elapsed % TIMING.cycleMs) / TIMING.cycleMs
+        const ratio = (Math.sin(phase * Math.PI * 2 - Math.PI / 2) + 1) / 2
+        const distance = Math.abs(ratio - 0.5)
+        const grade = getTimingGrade(distance)
+        return {
+            ...grade,
+            ratio,
+            distance,
+        }
+    }
+
+    syncTimingGauge() {
+        if (!this.timingNeedle || this.phase !== 'select') return
+        const timing = this.getTimingState()
+        const x = (timing.ratio - 0.5) * TIMING.barWidth
+        this.timingNeedle.clear()
+        this.timingNeedle.fillStyle(timing.color, 1)
+        this.timingNeedle.fillRoundedRect(x - 7, -22, 14, 44, 7)
+        this.timingNeedle.lineStyle(3, 0xffffff, 0.96)
+        this.timingNeedle.strokeRoundedRect(x - 7, -22, 14, 44, 7)
+    }
+
     handleKeyboardInput() {
         const keys = this.keyHandlers
-        if (!keys || this.phase !== 'select') return
+        if (!keys) return
+
+        if (this.phase === 'message') {
+            if (Phaser.Input.Keyboard.JustDown(keys.SPACE) || Phaser.Input.Keyboard.JustDown(keys.ENTER)) {
+                this.resolveMessage()
+            }
+            return
+        }
+
+        if (this.phase !== 'select') return
 
         if (Phaser.Input.Keyboard.JustDown(keys.LEFT) || Phaser.Input.Keyboard.JustDown(keys.A)) {
-            this.selectedLaneIndex = clamp(this.selectedLaneIndex - 1, 0, LANE_OFFSETS.length - 1)
+            this.selectedPlaceX = clamp(this.selectedPlaceX - PLACEMENT.keyStep, PLACEMENT.minX, PLACEMENT.maxX)
+            this.sfx?.lane?.play()
             this.createLaneButtons()
             this.createGhostView()
+            this.dispatchHud(false)
         }
         if (Phaser.Input.Keyboard.JustDown(keys.RIGHT) || Phaser.Input.Keyboard.JustDown(keys.D)) {
-            this.selectedLaneIndex = clamp(this.selectedLaneIndex + 1, 0, LANE_OFFSETS.length - 1)
+            this.selectedPlaceX = clamp(this.selectedPlaceX + PLACEMENT.keyStep, PLACEMENT.minX, PLACEMENT.maxX)
+            this.sfx?.lane?.play()
             this.createLaneButtons()
             this.createGhostView()
+            this.dispatchHud(false)
         }
         if (Phaser.Input.Keyboard.JustDown(keys.UP) || Phaser.Input.Keyboard.JustDown(keys.W)) {
             this.selectedChoiceIndex = clamp(this.selectedChoiceIndex - 1, 0, this.currentChoices.length - 1)
+            this.sfx?.select?.play()
             this.createChoiceCards()
             this.createGhostView()
             this.dispatchHud(false)
         }
         if (Phaser.Input.Keyboard.JustDown(keys.DOWN) || Phaser.Input.Keyboard.JustDown(keys.S)) {
             this.selectedChoiceIndex = clamp(this.selectedChoiceIndex + 1, 0, this.currentChoices.length - 1)
+            this.sfx?.select?.play()
             this.createChoiceCards()
             this.createGhostView()
             this.dispatchHud(false)
@@ -905,16 +1499,77 @@ export default class TowerCrashScene extends Phaser.Scene {
         }
     }
 
+    handleKeyboardKey(key) {
+        const isConfirmKey = key === ' ' || key === 'Space' || key === 'Spacebar' || key === 'Enter'
+        if (this.phase === 'message') {
+            if (isConfirmKey) {
+                this.resolveMessage()
+            }
+            return
+        }
+
+        if (this.phase !== 'select') return
+
+        if (key === 'ArrowLeft' || key === 'a' || key === 'A') {
+            this.selectedPlaceX = clamp(this.selectedPlaceX - PLACEMENT.keyStep, PLACEMENT.minX, PLACEMENT.maxX)
+            this.sfx?.lane?.play()
+            this.createLaneButtons()
+            this.createGhostView()
+            this.dispatchHud(false)
+            return
+        }
+
+        if (key === 'ArrowRight' || key === 'd' || key === 'D') {
+            this.selectedPlaceX = clamp(this.selectedPlaceX + PLACEMENT.keyStep, PLACEMENT.minX, PLACEMENT.maxX)
+            this.sfx?.lane?.play()
+            this.createLaneButtons()
+            this.createGhostView()
+            this.dispatchHud(false)
+            return
+        }
+
+        if (key === 'ArrowUp' || key === 'w' || key === 'W') {
+            this.selectedChoiceIndex = clamp(this.selectedChoiceIndex - 1, 0, this.currentChoices.length - 1)
+            this.sfx?.select?.play()
+            this.createChoiceCards()
+            this.createGhostView()
+            this.dispatchHud(false)
+            return
+        }
+
+        if (key === 'ArrowDown' || key === 's' || key === 'S') {
+            this.selectedChoiceIndex = clamp(this.selectedChoiceIndex + 1, 0, this.currentChoices.length - 1)
+            this.sfx?.select?.play()
+            this.createChoiceCards()
+            this.createGhostView()
+            this.dispatchHud(false)
+            return
+        }
+
+        if (key === 'b' || key === 'B') {
+            if (this.boostAvailable[this.currentPlayerIndex]) {
+                this.boostArmed = !this.boostArmed
+                this.sfx?.select?.play()
+                this.dispatchHud(false)
+            }
+            return
+        }
+
+        if (isConfirmKey) {
+            this.placeSelectedItem()
+        }
+    }
+
     checkCollapseOrSettle() {
         if (this.time.now - this.dropStartedAt < 520) return
 
-        const fallen = this.items.find((item) => item.body && this.isFallen(item.body))
+        const fallen = this.items.find((item) => item.body && !item.neutral && this.isFallen(item.body))
         if (fallen) {
             this.handleMiss(fallen)
             return
         }
 
-        const minWait = 950
+        const minWait = this.difficultyConfig.minWaitMs
         if (this.time.now - this.dropStartedAt < minWait) return
 
         if (this.isTowerStable()) {
@@ -924,7 +1579,7 @@ export default class TowerCrashScene extends Phaser.Scene {
             }
         } else {
             this.stableSince = null
-            if (this.time.now - this.dropStartedAt > 7200) {
+            if (this.time.now - this.dropStartedAt > this.difficultyConfig.timeoutMs) {
                 this.handleSafe()
             }
         }
@@ -940,19 +1595,32 @@ export default class TowerCrashScene extends Phaser.Scene {
     isTowerStable() {
         return this.items.every((item) => {
             if (!item.body) return true
-            return item.body.speed < 0.13 && Math.abs(item.body.angularVelocity) < 0.022
+            return item.body.speed < this.difficultyConfig.stableSpeed
+                && Math.abs(item.body.angularVelocity) < this.difficultyConfig.stableAngularVelocity
         })
     }
 
     handleSafe() {
         if (this.phase !== 'settling') return
         this.phase = 'message'
-        this.successes[this.currentPlayerIndex] += 1
+        const player = this.currentPlayerIndex
+        const placedItem = this.currentDroppingItem
+        const kind = placedItem?.kind
+        const pointBreakdown = this.calculateTurnPoints(player, kind, this.selectedPlaceX, true, this.lastTimingState, this.lastBoostUsed)
+        const turnPoints = pointBreakdown.total
+        this.successes[player] += 1
+        this.streaks[player] += 1
+        this.scorePoints[player] += turnPoints
         this.currentDroppingItem = null
-        this.showFloatingText(WORLD.tableCenterX, 250, 'SAFE!', 0x2da65d)
-        this.showMessage('セーフ！', '次の人へ交代するよ')
+        this.lastTimingState = null
+        this.lastBoostUsed = false
+        this.sfx?.safe?.play()
+        this.showStamp(WORLD.tableCenterX, 250, 'safe')
+        this.showSparkBurst(WORLD.tableCenterX, 295, 0x2da65d)
+        this.showFloatingText(WORLD.tableCenterX, 330, `+${turnPoints}`, pointBreakdown.bonusTotal > 0 ? 0xf0a51f : 0x2da65d)
+        this.showMessage('セーフ！', pointBreakdown.message)
+        this.pendingMessageAction = () => this.advanceTurn()
         this.dispatchHud(true)
-        this.time.delayedCall(720, () => this.advanceTurn())
     }
 
     handleMiss(fallenItem) {
@@ -961,25 +1629,96 @@ export default class TowerCrashScene extends Phaser.Scene {
         const player = this.currentPlayerIndex
         this.hp[player] = Math.max(0, this.hp[player] - 1)
         this.misses[player] += 1
+        this.streaks[player] = 0
         if (this.hp[player] <= 0) {
             this.alive[player] = false
         }
 
         this.cameras.main.shake(320, 0.008)
-        this.showFloatingText(fallenItem.body.position.x, Math.min(fallenItem.body.position.y, 610), 'MISS!', 0xe94834)
-        const hpText = this.hp[player] > 0 ? `P${player + 1} HP -1` : `P${player + 1} 脱落…！`
+        this.sfx?.miss?.play()
+        this.showStamp(fallenItem.body.position.x, Math.min(fallenItem.body.position.y, 610), 'miss')
+        this.showSparkBurst(fallenItem.body.position.x, Math.min(fallenItem.body.position.y, 610), 0xe94834)
+        const hpText = this.hp[player] > 0 ? `P${player + 1} HP -1` : `P${player + 1} OUT`
         this.showMessage('くずれた！', hpText)
-        this.dispatchHud(true)
-        this.updatePlayerViews()
-
-        this.time.delayedCall(1280, () => {
+        this.pendingMessageAction = () => {
             this.clearStack()
             if (this.shouldFinish()) {
                 this.finishGame()
             } else {
                 this.advanceTurn()
             }
-        })
+        }
+        this.dispatchHud(true)
+        this.updatePlayerViews()
+    }
+
+    calculateTurnPoints(player, kind, x, forSafe = false, timingState = null, boostUsed = this.boostArmed) {
+        const itemPoints = kind?.points ?? 10
+        const challengeBonus = this.currentChallenge?.matches(kind, x)
+            ? this.currentChallenge.bonus
+            : 0
+        const event = this.currentPartyEvent ?? PARTY_EVENTS[0]
+        const targetBonus = Math.abs(x - this.targetPlaceX) <= TARGET_ZONE.radius ? TARGET_ZONE.bonus : 0
+        const edgeBonus = event.edgeBonus && isEdgePlacement(x) ? event.edgeBonus : 0
+        const riskyBonus = event.riskyBonus && isRiskyKind(kind) ? event.riskyBonus : 0
+        const comebackBonus = event.comebackBonus && this.isLowestScoringPlayer(player) ? event.comebackBonus : 0
+        const nextStreak = (this.streaks[player] ?? 0) + (forSafe ? 1 : 0)
+        const streakBonus = Math.min(80, Math.max(0, nextStreak - 1) * 20)
+        const feverBonus = nextStreak >= FEVER.triggerStreak ? FEVER.bonus : 0
+        const timingBonus = timingState?.bonus ?? 0
+        const subtotal = itemPoints + challengeBonus + targetBonus + edgeBonus + riskyBonus + comebackBonus + streakBonus + feverBonus + timingBonus
+        const boostMultiplier = boostUsed ? BOOST.multiplier : 1
+        const multiplier = (event.scoreMultiplier ?? 1) * boostMultiplier
+        const total = Math.round(subtotal * multiplier)
+        const bonusTotal = challengeBonus + targetBonus + edgeBonus + riskyBonus + comebackBonus + streakBonus + feverBonus + timingBonus
+        const messageParts = []
+        if (timingBonus > 0) messageParts.push(`${timingState.label} +${timingBonus}`)
+        if (challengeBonus > 0) messageParts.push(`お題 +${challengeBonus}`)
+        if (targetBonus > 0) messageParts.push(`TARGET +${targetBonus}`)
+        if (edgeBonus > 0) messageParts.push(`端 +${edgeBonus}`)
+        if (riskyBonus > 0) messageParts.push(`難物 +${riskyBonus}`)
+        if (comebackBonus > 0) messageParts.push(`逆転 +${comebackBonus}`)
+        if (streakBonus > 0) messageParts.push(`連続 +${streakBonus}`)
+        if (feverBonus > 0) messageParts.push(`FEVER +${feverBonus}`)
+        if (boostUsed) messageParts.push(`BOOST x${BOOST.multiplier}`)
+        if ((event.scoreMultiplier ?? 1) > 1) messageParts.push(`EVENT x${event.scoreMultiplier}`)
+
+        return {
+            itemPoints,
+            challengeBonus,
+            targetBonus,
+            edgeBonus,
+            riskyBonus,
+            comebackBonus,
+            streakBonus,
+            feverBonus,
+            timingBonus,
+            boostMultiplier,
+            multiplier,
+            bonusTotal,
+            total,
+            message: messageParts.length > 0 ? messageParts.join(' / ') : `雑貨点 +${itemPoints}`,
+        }
+    }
+
+    isLowestScoringPlayer(player) {
+        const aliveScores = this.scorePoints
+            .map((score, index) => ({ score, index }))
+            .filter(({ index }) => this.alive[index])
+        if (aliveScores.length <= 1) return false
+        const lowestScore = Math.min(...aliveScores.map(({ score }) => score))
+        return this.scorePoints[player] === lowestScore
+    }
+
+    resolveMessage() {
+        if (this.phase !== 'message') return
+        const action = this.pendingMessageAction
+        this.pendingMessageAction = null
+        if (action) {
+            action()
+        } else {
+            this.advanceTurn()
+        }
     }
 
     advanceTurn() {
@@ -1000,6 +1739,121 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.items = []
         this.currentDroppingItem = null
         this.stableSince = null
+    }
+
+
+    showTurnSplash(playerIndex) {
+        this.turnSplash?.destroy()
+        const container = this.add.container(646, 330).setDepth(95).setAlpha(0).setScale(0.72)
+        const plate = this.add.image(0, 0, 'ui-turn-plate').setDisplaySize(520, 168)
+        const robot = this.add.image(-168, 8, `robot-p${playerIndex + 1}`).setDisplaySize(118, 142)
+        const title = this.add.text(16, -26, `P${playerIndex + 1} TURN`, {
+            fontFamily: FONT,
+            fontSize: '58px',
+            color: '#1b1b1b',
+            fontStyle: 'bold',
+            stroke: '#ffffff',
+            strokeThickness: 8,
+        }).setOrigin(0.5)
+        const sub = this.add.text(18, 42, 'えらんで おく', {
+            fontFamily: FONT,
+            fontSize: '24px',
+            color: '#6b3a08',
+            fontStyle: 'bold',
+            stroke: '#ffffff',
+            strokeThickness: 5,
+        }).setOrigin(0.5)
+        container.add([plate, robot, title, sub])
+        this.turnSplash = container
+        this.tweens.add({
+            targets: container,
+            alpha: 1,
+            scaleX: 1,
+            scaleY: 1,
+            duration: 230,
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                this.tweens.add({
+                    targets: container,
+                    alpha: 0,
+                    scaleX: 1.08,
+                    scaleY: 1.08,
+                    delay: 520,
+                    duration: 260,
+                    ease: 'Sine.easeIn',
+                    onComplete: () => {
+                        container.destroy()
+                        if (this.turnSplash === container) this.turnSplash = null
+                    },
+                })
+            },
+        })
+    }
+
+    showPlaceBurst(x, y, color) {
+        const ring = this.add.graphics().setDepth(45)
+        ring.lineStyle(5, color, 0.9)
+        ring.strokeCircle(x, y, 12)
+        this.tweens.addCounter({
+            from: 12,
+            to: 62,
+            duration: 380,
+            ease: 'Cubic.easeOut',
+            onUpdate: (tween) => {
+                const value = tween.getValue()
+                ring.clear()
+                ring.lineStyle(5, color, Math.max(0, 1 - value / 62))
+                ring.strokeCircle(x, y, value)
+            },
+            onComplete: () => ring.destroy(),
+        })
+    }
+
+    showSparkBurst(x, y, color) {
+        for (let index = 0; index < 14; index += 1) {
+            const angle = (Math.PI * 2 * index) / 14
+            const distance = 38 + (index % 4) * 12
+            const dot = this.add.graphics().setDepth(64)
+            dot.fillStyle(color, 0.95)
+            dot.fillCircle(0, 0, 6)
+            dot.setPosition(x, y)
+            this.tweens.add({
+                targets: dot,
+                x: x + Math.cos(angle) * distance,
+                y: y + Math.sin(angle) * distance,
+                alpha: 0,
+                scaleX: 0.35,
+                scaleY: 0.35,
+                duration: 620,
+                ease: 'Cubic.easeOut',
+                onComplete: () => dot.destroy(),
+            })
+        }
+    }
+
+    showStamp(x, y, type) {
+        const key = type === 'safe' ? 'ui-stamp-safe' : 'ui-stamp-miss'
+        const stamp = this.add.image(x, y, key).setDepth(66).setScale(0.42).setAlpha(0)
+        this.tweens.add({
+            targets: stamp,
+            alpha: 1,
+            scaleX: 0.84,
+            scaleY: 0.84,
+            angle: type === 'safe' ? -6 : 7,
+            duration: 210,
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                this.tweens.add({
+                    targets: stamp,
+                    y: y - 54,
+                    alpha: 0,
+                    delay: 420,
+                    duration: 480,
+                    ease: 'Cubic.easeIn',
+                    onComplete: () => stamp.destroy(),
+                })
+            },
+        })
     }
 
     showMessage(main, hint = '') {
@@ -1053,7 +1907,7 @@ export default class TowerCrashScene extends Phaser.Scene {
         const results = Array.from({ length: this.playerCount }, (_, index) => {
             const survivalBonus = this.alive[index] ? 10000 : 0
             const hpBonus = this.hp[index] * 1200
-            const placeBonus = this.successes[index] * 80
+            const placeBonus = this.scorePoints[index] ?? 0
             const missPenalty = this.misses[index] * 30
             return {
                 player: index + 1,
@@ -1067,6 +1921,12 @@ export default class TowerCrashScene extends Phaser.Scene {
     dispatchHud(isAnswerChecked = false) {
         const selected = this.currentChoices[this.selectedChoiceIndex]
         const aliveCount = this.alive.filter(Boolean).length
+        const pointPreview = this.calculateTurnPoints(
+            this.currentPlayerIndex,
+            selected,
+            this.selectedPlaceX,
+            true
+        )
         runtimeHudTarget?.dispatchEvent(new CustomEvent('game-hud-update', {
             detail: {
                 currentPlayerIndex: this.currentPlayerIndex,
@@ -1075,28 +1935,56 @@ export default class TowerCrashScene extends Phaser.Scene {
                 alive: [...this.alive],
                 successes: [...this.successes],
                 misses: [...this.misses],
+                streaks: [...this.streaks],
+                boostAvailable: [...this.boostAvailable],
+                boostArmed: this.boostArmed,
+                boostMultiplier: BOOST.multiplier,
                 turnNumber: this.turnNumber,
                 maxTurns: this.maxTurns,
                 round: this.roundNumber,
-                scores: this.successes.map((count, index) => (this.alive[index] ? count : -999)),
-                currentScore: this.successes[this.currentPlayerIndex] ?? 0,
+                scores: this.scorePoints.map((score, index) => (this.alive[index] ? score : -999)),
+                currentScore: this.scorePoints[this.currentPlayerIndex] ?? 0,
                 combo: this.misses[this.currentPlayerIndex] ?? 0,
                 timeLeft: Math.max(0, this.maxTurns - this.turnNumber),
                 isAnswerChecked,
                 nextButtonLabel: '次の人へ',
                 actionButtonLabel: '置く！',
-                ruleName: '雑貨つみタワー',
+                ruleName: 'デスクつみタワー',
                 statusMessage: this.phase === 'select'
-                    ? `P${this.currentPlayerIndex + 1}: ${selected?.label ?? '雑貨'}をどこに置く？`
+                    ? `P${this.currentPlayerIndex + 1}: えらんで おく`
                     : this.phase === 'settling'
-                        ? 'グラグラ確認中… 机から落ちたらミス'
-                        : '交代中… 次のプレイヤーを待ってね',
+                        ? 'ぐらぐら中'
+                        : 'つぎへ',
                 selectedItemLabel: selected?.label ?? '雑貨',
                 selectedItemDescription: selected?.description ?? '置くものを選んでね',
+                selectedItemPoints: selected?.points ?? 0,
+                selectedItemIcon: selected?.icon ?? 'ITEM',
+                selectedItemColor: selected?.color ?? 0x4b72d9,
                 selectedItemKey: selected?.key ?? 'book',
-                selectedLaneIndex: this.selectedLaneIndex + 1,
+                selectedPlacementPercent: Math.round(getPlacementRatio(this.selectedPlaceX) * 100),
+                selectedLaneLabel: getPlacementLabel(this.selectedPlaceX),
+                targetPlacementPercent: Math.round(getPlacementRatio(this.targetPlaceX) * 100),
+                targetBonus: TARGET_ZONE.bonus,
+                isTargetMatched: Math.abs(this.selectedPlaceX - this.targetPlaceX) <= TARGET_ZONE.radius,
                 aliveCount,
                 difficultyLabel: this.difficultyConfig.label,
+                challengeLabel: this.currentChallenge?.label ?? '安全第一',
+                challengeHint: this.currentChallenge?.hint ?? '崩さず置く',
+                challengeBonus: this.currentChallenge?.bonus ?? 40,
+                partyEventLabel: this.currentPartyEvent?.label ?? '通常ラウンド',
+                partyEventHint: this.roundNumber >= ROUND_DROP.enabledFromRound && this.lastRoundDropLabel
+                    ? `DROP ${this.lastRoundDropLabel}`
+                    : this.currentPartyEvent?.hint ?? 'お題を狙う',
+                roundDropLabel: this.roundNumber >= ROUND_DROP.enabledFromRound
+                    ? this.lastRoundDropLabel
+                    : '',
+                roundItemScale: this.getRoundItemScale(),
+                projectedTurnPoints: pointPreview.total,
+                projectedBonusPoints: pointPreview.bonusTotal,
+                timingRuleLabel: `PERF +${TIMING.perfectBonus}`,
+                feverLabel: `FVR +${FEVER.bonus}`,
+                feverReady: (this.streaks[this.currentPlayerIndex] ?? 0) >= FEVER.triggerStreak - 1,
+                streak: this.streaks[this.currentPlayerIndex] ?? 0,
             },
         }))
     }

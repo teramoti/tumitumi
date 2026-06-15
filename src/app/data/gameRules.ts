@@ -1,9 +1,9 @@
 export const PLAYER_START_HP = 2
 
 export const MAX_TURNS_BY_DIFFICULTY = {
-  easy: 32,
-  normal: 36,
-  hard: 40,
+  easy: 8,
+  normal: 10,
+  hard: 12,
 } as const
 
 export const DIFFICULTY_LABELS = {

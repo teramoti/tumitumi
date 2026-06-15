@@ -21,6 +21,15 @@
   background: #86d9f5;
 }
 
+
+.gameScreenPanel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 6px rgba(255, 249, 236, 0.22);
+}
+
 .gameCanvasHost {
   position: absolute;
   inset: 0;
@@ -38,8 +47,8 @@
   top: 18px;
   left: 18px;
   z-index: 10;
-  width: 288px;
-  padding: 14px 14px 16px;
+  width: 270px;
+  padding: 12px;
   color: #1d1407;
   background: rgba(255, 249, 237, 0.96);
   border: 4px solid #7f5527;
@@ -50,7 +59,8 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
+  backdrop-filter: blur(2px);
 }
 
 .hudCornerTape {
@@ -87,7 +97,7 @@
 .miniHudBadge,
 .miniHudDifficulty,
 .turnHeroChip,
-.selectedMiniLabel {
+.turnHeroChip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -96,7 +106,8 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 1000;
-  letter-spacing: .08em;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .miniHudBadge {
@@ -106,17 +117,17 @@
 
 .miniHudDifficulty,
 .turnHeroChip,
-.selectedMiniLabel {
+.turnHeroChip {
   color: #6c4b12;
   background: #fff0bc;
 }
 
 .turnHeroCard {
   display: grid;
-  grid-template-columns: 72px 1fr;
-  gap: 10px;
+  grid-template-columns: 58px 1fr;
+  gap: 8px;
   align-items: center;
-  padding: 10px;
+  padding: 8px;
   background: linear-gradient(180deg, #ffffff, #fff0b9);
   border: 3px solid #b57a2e;
   border-radius: 20px;
@@ -124,8 +135,8 @@
 }
 
 .turnHeroRobot {
-  width: 72px;
-  height: 72px;
+  width: 58px;
+  height: 58px;
   object-fit: contain;
   background: rgba(255,255,255,.7);
   border: 2px solid rgba(150, 101, 35, 0.22);
@@ -135,7 +146,7 @@
 .turnHeroPlayer {
   margin: 4px 0 1px;
   color: #1d1b19;
-  font-size: 28px;
+  font-size: 23px;
   line-height: 1;
   font-weight: 1000;
 }
@@ -151,38 +162,74 @@
   flex: 1;
   min-width: 0;
   display: grid;
-  grid-template-columns: 54px 1fr;
+  grid-template-columns: 46px 1fr;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: 7px;
+  padding: 7px;
   background: rgba(255,255,255,.92);
   border: 2px solid #d9b57a;
   border-radius: 16px;
 }
 
 .selectedItemMiniImage {
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
+}
+
+.selectedItemFallback {
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border: 2px solid rgba(38, 38, 38, .4);
+  border-radius: 12px;
+  box-shadow: inset 0 -5px 0 rgba(0,0,0,.12);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 1000;
 }
 
 .selectedItemMiniText {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  justify-content: center;
+  gap: 3px;
 }
 
 .selectedItemMiniText strong,
 .laneMiniBadge strong {
   color: #1b1b1b;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
 }
 
+.selectedItemMiniText span,
+.laneMiniBadge span {
+  color: #6c4b12;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.laneMiniBadge em {
+  color: #8b5d24;
+  font-size: 10px;
+  line-height: 1;
+  font-style: normal;
+  font-weight: 1000;
+}
+
 .laneMiniBadge {
-  width: 76px;
-  padding: 8px 10px;
+  width: 70px;
+  min-height: 64px;
+  padding: 7px 9px;
   background: rgba(255,255,255,.92);
   border: 2px solid #d9b57a;
   border-radius: 16px;
@@ -191,6 +238,97 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
+}
+
+.scoreStrip {
+  display: grid;
+  grid-template-columns: .85fr 1fr 1fr;
+  gap: 5px;
+}
+
+.scoreStrip span {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #174d2c;
+  background: #ebfff3;
+  border: 2px solid #98cfaa;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 1000;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.scoreStrip .scoreTargetHit {
+  color: #174d2c;
+  background: #eafff0;
+  border-color: #7ac691;
+}
+
+.challengeCard,
+.partyEventCard {
+  padding: 7px 10px;
+  background: linear-gradient(180deg, #fff9df, #ffe7a6);
+  border: 2px solid #d2a55d;
+  border-radius: 16px;
+  box-shadow: inset 0 -5px 0 rgba(196, 143, 47, 0.1);
+}
+
+.partyEventCard {
+  background: linear-gradient(180deg, #eaf7ff, #cdeaff);
+  border-color: #8abbe8;
+  box-shadow: inset 0 -5px 0 rgba(80, 141, 191, 0.1);
+}
+
+.challengeCard div,
+.partyEventCard div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.challengeCard span,
+.partyEventCard span {
+  color: #8b5d24;
+  font-size: 10px;
+  font-weight: 1000;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.partyEventCard span {
+  color: #245d87;
+}
+
+.challengeCard strong,
+.partyEventCard strong {
+  min-width: 0;
+  color: #1b1b1b;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 1000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.challengeCard p,
+.partyEventCard p {
+  margin: 4px 0 0;
+  color: #5f4218;
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.partyEventCard p {
+  color: #245d87;
 }
 
 .miniProgressRail {
@@ -210,15 +348,29 @@
   transition: width 220ms ease;
 }
 
-.controlsSticker {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 18px;
+.controlStrip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.15fr;
+  gap: 5px;
+}
+
+.controlStrip span {
+  min-height: 29px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #173963;
+  background: #e8f5ff;
+  border: 2px solid #9cc3e8;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 1000;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .miniPlayersSection {
-  padding: 10px;
+  padding: 9px;
   background: rgba(255,255,255,.9);
   border: 2px solid #d9b57a;
   border-radius: 18px;
@@ -233,18 +385,19 @@
 
 .miniPlayersGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 8px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 7px;
 }
 
 .miniPlayerCard {
+  min-width: 0;
   display: grid;
-  grid-template-columns: 42px 1fr;
-  gap: 8px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 5px;
   align-items: center;
-  min-height: 62px;
-  padding: 8px;
+  min-height: 52px;
+  padding: 6px;
   background: linear-gradient(180deg, #ffffff, #fef6de);
   border: 2px solid rgba(175, 123, 47, 0.55);
   border-radius: 14px;
@@ -263,34 +416,45 @@
 }
 
 .miniPlayerRobot {
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
 }
 
 .miniPlayerText {
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+}
+
+.miniPlayerHead {
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .miniPlayerName {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 1000;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .miniPlayerState {
   color: #8b5d24;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 1000;
-  letter-spacing: .08em;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .heartRow {
   display: flex;
-  gap: 3px;
-  font-size: 17px;
+  gap: 2px;
+  font-size: 15px;
   line-height: 1;
 }
 
@@ -307,31 +471,21 @@
   color: rgba(94, 72, 52, 0.35);
 }
 
-.miniHudStatus {
-  min-height: 38px;
-  margin: 0;
-  padding: 8px 10px;
-  color: #5b3914;
-  background: rgba(255, 244, 213, 0.9);
-  border: 2px dashed rgba(150, 104, 30, 0.4);
-  border-radius: 14px;
-  box-sizing: border-box;
-  font-size: 12px;
-  line-height: 1.45;
-  font-weight: 900;
-}
-
 .gameHudButton {
   width: 100%;
-  height: 58px;
+  height: 54px;
+  animation: hudButtonPulse 2.4s ease-in-out infinite;
   border: none;
   border-radius: 18px;
   color: #ffffff;
   font-family: inherit;
-  font-size: 24px;
+  font-size: 23px;
   font-weight: 1000;
   letter-spacing: .08em;
-  cursor: pointer;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
 }
 
@@ -345,10 +499,7 @@
   box-shadow: 0 6px 0 rgba(27, 88, 49, 0.7);
 }
 
-.gameHudButton:hover {
-  filter: brightness(1.05);
-}
-
-.gameHudButton:active {
-  transform: translateY(3px);
+@keyframes hudButtonPulse {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
 }
