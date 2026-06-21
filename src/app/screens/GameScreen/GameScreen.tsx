@@ -58,6 +58,8 @@ type GameHudState = {
   feverLabel?: string
   feverReady?: boolean
   streak?: number
+  stackHeight?: number
+  choiceCount?: number
 }
 
 const ROBOT_IMAGE_PATHS = [
@@ -77,7 +79,19 @@ const ITEM_IMAGE_PATHS: Record<string, string> = {
   tape: '/assets/item_tape.png',
   ruler: '/assets/item_ruler.png',
   mug: '/assets/item_mug.png',
-  battery: '/assets/item_battery.png'
+  battery: '/assets/item_battery.png',
+  marker: '/assets/item_marker.png',
+  glue: '/assets/item_glue.png',
+  stapler: '/assets/item_stapler.png',
+  scissors: '/assets/item_scissors.png',
+  phone: '/assets/item_phone.png',
+  dice: '/assets/item_dice.png',
+  clip: '/assets/item_clip.png',
+  key: '/assets/item_key.png',
+  watch: '/assets/item_watch.png',
+  card: '/assets/item_card.png',
+  headphones: '/assets/item_headphones.png',
+  earphoneJack: '/assets/item_earphoneJack.png'
 }
 
 function Hearts({ hp, alive }: { hp: number, alive: boolean }) {
@@ -104,16 +118,16 @@ export default function GameScreen({ settings, onFinish }: Props) {
     boostArmed: false,
     boostMultiplier: 2.5,
     turnNumber: 0,
-    maxTurns: getMaxTurns(difficultyForInit),
+    maxTurns: getMaxTurns(difficultyForInit, settings.playerCount),
     round: 1,
     scores: Array(settings.playerCount).fill(null),
     currentScore: 0,
     combo: 0,
-    timeLeft: getMaxTurns(difficultyForInit),
+    timeLeft: getMaxTurns(difficultyForInit, settings.playerCount),
     isAnswerChecked: false,
     nextButtonLabel: '次の人へ',
     actionButtonLabel: '置く！',
-    ruleName: 'デスクつみタワー',
+    ruleName: 'デスクつみタワーEX',
     selectedItemLabel: '雑貨',
     selectedItemDescription: '置くものを選んでね',
     selectedItemPoints: 0,
@@ -139,7 +153,9 @@ export default function GameScreen({ settings, onFinish }: Props) {
     timingRuleLabel: 'PERF +70',
     feverLabel: 'FVR +100',
     feverReady: false,
-    streak: 0
+    streak: 0,
+    stackHeight: 0,
+    choiceCount: 3
   })
 
   const ref = useRef<HTMLDivElement | null>(null)
@@ -210,7 +226,7 @@ export default function GameScreen({ settings, onFinish }: Props) {
           <div className="hudCornerTape hudCornerTapeRight" aria-hidden="true" />
 
           <div className="miniHudTopRow">
-            <span className="miniHudBadge">{hud.ruleName || 'デスクつみタワー'}</span>
+            <span className="miniHudBadge">{hud.ruleName || 'デスクつみタワーEX'}</span>
             <span className="miniHudDifficulty">{hud.difficultyLabel}</span>
           </div>
 
@@ -254,6 +270,7 @@ export default function GameScreen({ settings, onFinish }: Props) {
           <div className="scoreStrip" aria-label="スコア">
             <span className={hud.isTargetMatched ? 'scoreTargetHit' : ''}>TGT {hud.targetPlacementPercent ?? 50}%</span>
             <span>NEXT +{hud.projectedTurnPoints ?? hud.selectedItemPoints ?? 0}</span>
+            <span>HIGH {hud.stackHeight ?? 0}px</span>
             <span>TOTAL {hud.currentScore}</span>
           </div>
 
@@ -262,7 +279,8 @@ export default function GameScreen({ settings, onFinish }: Props) {
               <span>EVENT</span>
               <strong>{hud.partyEventLabel ?? '通常ラウンド'}</strong>
             </div>
-            <p>{hud.roundDropLabel ? 'DROP / ' : ''}SIZE x{(hud.roundItemScale ?? 1).toFixed(1)} / {hud.boostArmed ? 'BST x2.5' : hud.boostAvailable?.[hud.currentPlayerIndex] ? 'B x2.5' : 'B USED'} / S{hud.streak ?? 0}</p>
+            <p>{hud.partyEventHint ?? ''}</p>
+            <p>CHOICE {hud.choiceCount ?? 3} / SIZE x{(hud.roundItemScale ?? 1).toFixed(1)} / {hud.boostArmed ? 'BST x2.5' : hud.boostAvailable?.[hud.currentPlayerIndex] ? 'B x2.5' : 'B USED'} / S{hud.streak ?? 0}</p>
           </section>
 
           <section className="challengeCard" aria-label="お題">
@@ -281,6 +299,7 @@ export default function GameScreen({ settings, onFinish }: Props) {
             <span>←→ 場所</span>
             <span>↑↓ 雑貨</span>
             <span>B BOOST</span>
+            <span>PERFECTで安定</span>
           </div>
 
           <section className="miniPlayersSection" aria-label="プレイヤーHP">

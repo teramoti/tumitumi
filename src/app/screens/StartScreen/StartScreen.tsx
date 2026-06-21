@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import './StartScreen.css'
 
 const startBgm = '/assets/start_bgm.wav'
@@ -23,7 +23,7 @@ const difficultyDescriptions: Record<Difficulty, string> = {
 const howToSlides = [
   {
     title: '雑貨を選ぶ',
-    body: '毎ターン3つの候補から1つを選ぶ。重いもの、転がるもの、細いものは点が高い。',
+    body: '毎ターン4〜5個の候補から1つを選ぶ。重いもの、転がるもの、細いものは点が高い。',
     command: '↑ ↓'
   },
   {
@@ -33,17 +33,125 @@ const howToSlides = [
   },
   {
     title: 'BOOSTとタイミング',
-    body: 'Bで1回だけBOOST。SPACEで置く。PERFECTなら追加点。2周目から障害物が落ちる。',
+    body: 'Bで1回だけBOOST。SPACEで置く。PERFECTなら追加点だけでなく、物理的にも少し安定する。2周目から障害物が落ちる。',
     command: 'B / SPACE'
   }
 ]
 
 const difficulties: Difficulty[] = ['easy', 'normal', 'hard']
 
+const CONFETTI_COLORS = ['#ef5947', '#ffd65f', '#2aa7a3', '#4b72d9', '#ffffff']
+
+function TitleFxCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const context = canvas.getContext('2d')
+    if (!context) return
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const colors = ['#ef5947', '#ffd65f', '#2aa7a3', '#4b72d9', '#ffffff']
+    let animationFrame = 0
+    let lastFrame = 0
+
+    const drawStar = (x: number, y: number, radius: number, rotation: number, color: string, alpha: number) => {
+      context.save()
+      context.translate(x, y)
+      context.rotate(rotation)
+      context.globalAlpha = alpha
+      context.fillStyle = color
+      context.beginPath()
+      for (let point = 0; point < 10; point += 1) {
+        const angle = -Math.PI / 2 + point * Math.PI / 5
+        const distance = point % 2 === 0 ? radius : radius * 0.42
+        context.lineTo(Math.cos(angle) * distance, Math.sin(angle) * distance)
+      }
+      context.closePath()
+      context.fill()
+      context.restore()
+    }
+
+    const render = (time: number) => {
+      animationFrame = window.requestAnimationFrame(render)
+      if (time - lastFrame < 33) return
+      lastFrame = time
+
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.5)
+      const width = canvas.clientWidth
+      const height = canvas.clientHeight
+      if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
+        canvas.width = Math.round(width * ratio)
+        canvas.height = Math.round(height * ratio)
+      }
+      context.setTransform(ratio, 0, 0, ratio, 0, 0)
+      context.clearRect(0, 0, width, height)
+
+      const cycle = reduceMotion ? 0.18 : (time % 2200) / 2200
+      const originX = width * 0.54
+      const originY = height * 0.68
+      const fade = Math.max(0, 1 - cycle)
+
+      context.save()
+      context.globalAlpha = fade * 0.8
+      context.lineWidth = 5
+      context.strokeStyle = '#fff4b8'
+      context.beginPath()
+      context.arc(originX, originY, 26 + cycle * 150, 0, Math.PI * 2)
+      context.stroke()
+      context.restore()
+
+      for (let index = 0; index < 22; index += 1) {
+        const angle = -Math.PI * 0.92 + index * (Math.PI * 1.84 / 21)
+        const speed = 92 + (index % 6) * 18
+        const distance = 20 + speed * cycle
+        const x = originX + Math.cos(angle) * distance
+        const y = originY + Math.sin(angle) * distance + cycle * cycle * 82
+        const color = colors[index % colors.length]
+        if (index % 5 === 0) {
+          drawStar(x, y, 7 + (index % 3) * 2, cycle * 5 + index, color, fade)
+        } else {
+          context.save()
+          context.globalAlpha = fade
+          context.strokeStyle = color
+          context.lineWidth = 4
+          context.lineCap = 'round'
+          context.beginPath()
+          context.moveTo(x, y)
+          context.lineTo(x - Math.cos(angle) * 14, y - Math.sin(angle) * 14)
+          context.stroke()
+          context.restore()
+        }
+      }
+
+      if (reduceMotion) window.cancelAnimationFrame(animationFrame)
+    }
+
+    animationFrame = window.requestAnimationFrame(render)
+    return () => window.cancelAnimationFrame(animationFrame)
+  }, [])
+
+  return <canvas className="titleFxCanvas" ref={canvasRef} />
+}
+
 function TowerPreview() {
   return (
     <div className="stationeryPreview" aria-hidden="true">
       <div className="previewSky" />
+      <div className="titleConfetti">
+        {Array.from({ length: 18 }, (_, index) => (
+          <span
+            key={index}
+            style={{
+              '--confetti-x': `${3 + ((index * 37) % 94)}%`,
+              '--confetti-delay': `${-(index * 0.29)}s`,
+              '--confetti-color': CONFETTI_COLORS[index % CONFETTI_COLORS.length]
+            } as CSSProperties}
+          />
+        ))}
+      </div>
       <div className="previewSpotlight previewSpotlightLeft" />
       <div className="previewSpotlight previewSpotlightRight" />
       <img className="previewRobot previewRobotLeft" src="/assets/char_robot_p1.png" alt="" />
@@ -55,10 +163,15 @@ function TowerPreview() {
       <img className="previewObject previewRuler" src="/assets/item_ruler.png" alt="" />
       <img className="previewObject previewBox" src="/assets/item_box.png" alt="" />
       <img className="previewObject previewTape" src="/assets/item_tape.png" alt="" />
+      <img className="previewDropObject previewDropMug" src="/assets/item_mug.png" alt="" />
+      <img className="previewDropObject previewDropBattery" src="/assets/item_battery.png" alt="" />
+      <img className="previewDropObject previewDropEraser" src="/assets/item_eraser.png" alt="" />
       <div className="previewTargetBadge">TARGET</div>
       <div className="previewBoostBadge">BOOST x2.5</div>
       <div className="previewCursor" />
       <div className="previewDesk" />
+      <div className="previewImpactRing" />
+      <TitleFxCanvas />
     </div>
   )
 }
@@ -210,14 +323,15 @@ export default function StartScreen({ onStart }: Props) {
     }
   }, [difficulty, howToIndex, isHowToOpen, onStart, playerCount])
 
-  const maxTurns = getMaxTurns(difficulty)
+  const maxTurns = getMaxTurns(difficulty, playerCount)
 
   return (
     <div className="startShell">
       <main className="startStage">
+        <div className="titleScreenFlash" aria-hidden="true" />
         <header className="startTitleBlock">
-          <span className="startBadge">DESK STACK</span>
-          <h1>デスクつみタワー</h1>
+          <span className="startBadge">DESK STACK EX</span>
+          <h1>デスクつみタワーEX</h1>
           <p>短い足場で一気に勝負するターン制バランスゲーム</p>
         </header>
 

@@ -48,24 +48,36 @@ const PLAYER_FLOOR = {
 }
 
 const TIMING = {
-    cycleMs: 1350,
+    cycleMs: 1180,
     barWidth: 270,
     perfectRange: 0.08,
     goodRange: 0.22,
-    perfectBonus: 70,
-    goodBonus: 30,
+    perfectBonus: 90,
+    goodBonus: 40,
     badAnglePenalty: 0.1,
     badSpin: 0.055,
 }
 
 const TARGET_ZONE = {
-    bonus: 60,
-    radius: 42,
+    bonus: 80,
+    radius: 36,
 }
 
 const FEVER = {
     triggerStreak: 3,
-    bonus: 100,
+    bonus: 140,
+}
+
+const HEIGHT_BONUS = {
+    stepPx: 72,
+    points: 35,
+    cap: 280,
+}
+
+const CHOICE_COUNT_BY_DIFFICULTY = {
+    easy: 4,
+    normal: 4,
+    hard: 5,
 }
 
 const BOOST = {
@@ -177,62 +189,62 @@ const ITEM_KINDS = {
     marker: {
         key: 'marker', label: 'マーカー', icon: 'MARK', description: '軽くて細い', shape: 'marker', width: 118, height: 18,
         color: 0xff7aa5, accent: 0xffffff, density: 0.0026, friction: 0.68, frictionStatic: 0.48,
-        points: 30, noAsset: true,
+        points: 30,
     },
     glue: {
         key: 'glue', label: 'のり', icon: 'GLUE', description: '背が高い', shape: 'glue', width: 44, height: 72,
         color: 0xffffff, accent: 0x4bb7ff, density: 0.0038, friction: 0.74, frictionStatic: 0.55,
-        points: 35, noAsset: true,
+        points: 35,
     },
     stapler: {
         key: 'stapler', label: 'ホチキス', icon: 'STPL', description: '重くて傾く', shape: 'stapler', width: 92, height: 36,
         color: 0x6f89a5, accent: 0xe8f5ff, density: 0.005, friction: 0.78, frictionStatic: 0.62,
-        points: 36, noAsset: true,
+        points: 36,
     },
     scissors: {
         key: 'scissors', label: 'はさみ', icon: 'CUT', description: '不規則で危険', shape: 'scissors', width: 104, height: 34,
         color: 0xd7dce5, accent: 0xef5947, density: 0.0036, friction: 0.58, frictionStatic: 0.38,
-        points: 42, noAsset: true,
+        points: 42,
     },
     phone: {
         key: 'phone', label: 'スマホ', icon: 'TEL', description: '薄くて重い', shape: 'phone', width: 72, height: 42,
         color: 0x202938, accent: 0x7dd7ff, density: 0.0062, friction: 0.82, frictionStatic: 0.7,
-        points: 40, noAsset: true,
+        points: 40,
     },
     dice: {
         key: 'dice', label: 'サイコロ', icon: 'DICE', description: '小さく跳ねる', shape: 'dice', width: 46, height: 46,
         color: 0xffffff, accent: 0x252525, density: 0.0032, friction: 0.5, frictionStatic: 0.35, restitution: 0.12,
-        points: 44, noAsset: true,
+        points: 44,
     },
     clip: {
         key: 'clip', label: 'クリップ', icon: 'CLIP', description: '細くて軽い', shape: 'clip', width: 72, height: 22,
         color: 0xd7dce5, accent: 0x5d7899, density: 0.0024, friction: 0.5, frictionStatic: 0.3,
-        points: 33, noAsset: true,
+        points: 33,
     },
     key: {
         key: 'key', label: 'カギ', icon: 'KEY', description: '小さくて重心が偏る', shape: 'key', width: 76, height: 28,
         color: 0xf6c85f, accent: 0x9b6413, density: 0.0048, friction: 0.54, frictionStatic: 0.34,
-        points: 41, noAsset: true,
+        points: 41,
     },
     watch: {
         key: 'watch', label: '時計', icon: 'TIME', description: '丸くて転がりやすい', shape: 'watch', width: 54, height: 54,
         color: 0x26384f, accent: 0x9fe6ff, density: 0.004, friction: 0.44, frictionStatic: 0.25, restitution: 0.06,
-        points: 43, noAsset: true,
+        points: 43,
     },
     card: {
         key: 'card', label: 'カード', icon: 'CARD', description: '薄くて滑りやすい', shape: 'card', width: 88, height: 18,
         color: 0xffffff, accent: 0xef5947, density: 0.0022, friction: 0.42, frictionStatic: 0.24,
-        points: 31, noAsset: true,
+        points: 31,
     },
     headphones: {
         key: 'headphones', label: 'イヤホン', icon: 'EAR', description: '形が不安定', shape: 'headphones', width: 86, height: 42,
         color: 0x6f4fc7, accent: 0xffd65f, density: 0.003, friction: 0.48, frictionStatic: 0.3,
-        points: 46, noAsset: true,
+        points: 46,
     },
     earphoneJack: {
         key: 'earphoneJack', label: 'イヤホンジャック', icon: 'JACK', description: '細くて先端が重い', shape: 'earphoneJack', width: 96, height: 20,
         color: 0x2f3a4a, accent: 0xcdd5e2, density: 0.0046, friction: 0.5, frictionStatic: 0.32,
-        points: 48, noAsset: true,
+        points: 48,
     },
 }
 
@@ -265,6 +277,27 @@ const CHALLENGES = [
         bonus: 100,
         matches: (kind) => ['can', 'tape', 'ruler', 'mug', 'battery', 'marker', 'glue', 'scissors', 'dice', 'clip', 'key', 'watch', 'card', 'headphones', 'earphoneJack'].includes(kind?.shape),
     },
+    {
+        key: 'perfect',
+        label: 'PERFECT審査',
+        hint: 'PERFECTで置く',
+        bonus: 140,
+        matches: (_kind, _x, context = {}) => context.timingState?.key === 'perfect',
+    },
+    {
+        key: 'highTower',
+        label: '高さ勝負',
+        hint: '高いタワーで成功',
+        bonus: 120,
+        matches: (_kind, _x, context = {}) => (context.stackHeight ?? 0) >= 220,
+    },
+    {
+        key: 'boostOrder',
+        label: 'BOOST注文',
+        hint: 'BOOSTを使って成功',
+        bonus: 150,
+        matches: (_kind, _x, context = {}) => Boolean(context.boostUsed),
+    },
 ]
 
 const PARTY_EVENTS = [
@@ -276,27 +309,52 @@ const PARTY_EVENTS = [
     {
         key: 'double',
         label: 'ダブル点',
-        hint: '成功点 x2',
+        hint: '成功点 x2 / でも少し揺れる',
         scoreMultiplier: 2,
+        angleJitterBonus: 0.012,
     },
     {
         key: 'edgeRush',
         label: '端攻め祭り',
-        hint: '端置き +90',
-        edgeBonus: 90,
+        hint: '端置き +120 / TARGET狭め',
+        edgeBonus: 120,
+        targetRadiusBonus: -8,
     },
     {
         key: 'comeback',
         label: '逆転チャンス',
-        hint: '最下位成功 +90',
-        comebackBonus: 90,
+        hint: '最下位成功 +130',
+        comebackBonus: 130,
+    },
+    {
+        key: 'precision',
+        label: '精密審査',
+        hint: 'PERFECT +160 / LATEは揺れる',
+        timingBonusBoost: 160,
+        angleJitterBonus: 0.018,
+    },
+    {
+        key: 'crossWind',
+        label: '横風注意',
+        hint: '落下中に横風 / 成功 +100',
+        windForce: 0.00042,
+        windDirection: 1,
+        survivalBonus: 100,
+    },
+    {
+        key: 'reverseWind',
+        label: '逆風注意',
+        hint: '逆方向の横風 / 成功 +100',
+        windForce: 0.00042,
+        windDirection: -1,
+        survivalBonus: 100,
     },
     {
         key: 'danger',
         label: '高難度ボーナス',
-        hint: '難物成功 +100',
-        riskyBonus: 100,
-        angleJitterBonus: 0.035,
+        hint: '難物成功 +140 / 揺れ強め',
+        riskyBonus: 140,
+        angleJitterBonus: 0.045,
     },
 ]
 
@@ -395,7 +453,6 @@ export default class TowerCrashScene extends Phaser.Scene {
 
     preload() {
         Object.values(ITEM_KINDS).forEach((kind) => {
-            if (kind.noAsset) return
             this.load.image(`item-${kind.key}`, `/assets/item_${kind.key}.png`)
         })
         for (let index = 1; index <= 4; index += 1) {
@@ -418,7 +475,7 @@ export default class TowerCrashScene extends Phaser.Scene {
         const difficulty = runtimeSettings.difficulty || this.bootData.difficulty || 'normal'
         this.difficultyConfig = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.normal
         this.playerCount = clamp(Number(runtimeSettings.playerCount || this.bootData.playerCount || 4), 1, 4)
-        this.maxTurns = getMaxTurns(difficulty)
+        this.maxTurns = getMaxTurns(difficulty, this.playerCount)
         this.hp = Array(this.playerCount).fill(PLAYER_START_HP)
         this.alive = Array(this.playerCount).fill(true)
         this.successes = Array(this.playerCount).fill(0)
@@ -450,7 +507,7 @@ export default class TowerCrashScene extends Phaser.Scene {
             lane: this.sound.add('se-lane', { volume: 0.36 }),
         }
 
-        this.showMessage('デスクつみタワー', 'えらぶ → ばしょ → おく')
+        this.showMessage('デスクつみタワー EX', '選択・位置・タイミング・お題を全部見る')
         this.time.delayedCall(650, () => this.beginTurn(0))
     }
 
@@ -746,7 +803,8 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.turnNumber += 1
         this.roundNumber = Math.floor((this.turnNumber - 1) / Math.max(1, this.playerCount)) + 1
 
-        this.currentChoices = uniqueChoices(this.difficultyConfig.cardPool, 3)
+        const choiceCount = CHOICE_COUNT_BY_DIFFICULTY[difficulty] ?? 4
+        this.currentChoices = uniqueChoices(this.difficultyConfig.cardPool, choiceCount)
         const challengePool = CHALLENGES.filter((challenge) => (
             challenge.key !== 'risky'
             || this.currentChoices.some((kind) => challenge.matches(kind, this.selectedPlaceX))
@@ -816,16 +874,18 @@ export default class TowerCrashScene extends Phaser.Scene {
     createChoiceCards() {
         this.destroyChoiceCards()
         const startX = 1130
-        const startY = 194
+        const startY = this.currentChoices.length >= 5 ? 124 : 160
+        const cardGap = this.currentChoices.length >= 5 ? 82 : 98
+        const cardHeight = this.currentChoices.length >= 5 ? 66 : 74
         this.currentChoices.forEach((kind, index) => {
-            const y = startY + index * 112
+            const y = startY + index * cardGap
             const selected = index === this.selectedChoiceIndex
             const card = this.add.container(startX, y).setDepth(35)
             const bg = this.add.graphics()
             bg.fillStyle(selected ? 0xfff1a6 : 0xffffff, 0.97)
-            bg.fillRoundedRect(-108, -40, 216, 80, 18)
+            bg.fillRoundedRect(-108, -cardHeight / 2, 216, cardHeight, 18)
             bg.lineStyle(5, selected ? PLAYER_COLORS[this.currentPlayerIndex] : 0xc1914f, 1)
-            bg.strokeRoundedRect(-108, -40, 216, 80, 18)
+            bg.strokeRoundedRect(-108, -cardHeight / 2, 216, cardHeight, 18)
             bg.fillStyle(0x000000, 0.08)
             bg.fillRoundedRect(-96, 26, 192, 7, 6)
             bg.fillStyle(selected ? PLAYER_COLORS[this.currentPlayerIndex] : 0xffdf89, 1)
@@ -849,7 +909,7 @@ export default class TowerCrashScene extends Phaser.Scene {
 
             const label = this.add.text(0, 0, kind.label, {
                 fontFamily: FONT,
-                fontSize: '25px',
+                fontSize: this.currentChoices.length >= 5 ? '21px' : '24px',
                 color: '#1b1b1b',
                 fontStyle: 'bold',
                 stroke: '#ffffff',
@@ -857,7 +917,7 @@ export default class TowerCrashScene extends Phaser.Scene {
             }).setOrigin(0, 0.5)
 
             card.add([bg, numberText, sample, label])
-            card.setSize(216, 80)
+            card.setSize(216, cardHeight)
             if (selected) {
                 card.setScale(1.06)
                 this.tweens.add({
@@ -916,7 +976,7 @@ export default class TowerCrashScene extends Phaser.Scene {
             strokeThickness: 4,
         }).setOrigin(0.5)
 
-        const hint = this.add.text(width / 2, -48, '← → 位置 / SPACE タイミング', {
+        const hint = this.add.text(width / 2, -48, `${this.currentPartyEvent?.label || 'EVENT'} / ←→位置 / SPACEタイミング`, {
             fontFamily: FONT,
             fontSize: '18px',
             color: '#6b3a08',
@@ -1016,7 +1076,12 @@ export default class TowerCrashScene extends Phaser.Scene {
         const x = this.selectedPlaceX
         const y = this.getSpawnY()
         const timingPenalty = this.lastTimingState?.key === 'late' ? TIMING.badAnglePenalty : 0
-        const angleJitterRange = this.difficultyConfig.angleJitter + (this.currentPartyEvent?.angleJitterBonus ?? 0) + timingPenalty
+        const timingStability = this.lastTimingState?.key === 'perfect'
+            ? 0.34
+            : this.lastTimingState?.key === 'good'
+                ? 0.62
+                : 1
+        const angleJitterRange = (this.difficultyConfig.angleJitter + (this.currentPartyEvent?.angleJitterBonus ?? 0) + timingPenalty) * timingStability
         const angleJitter = Phaser.Math.FloatBetween(
             -angleJitterRange,
             angleJitterRange
@@ -1032,6 +1097,15 @@ export default class TowerCrashScene extends Phaser.Scene {
                 x: 0.0009 * spinDirection,
                 y: 0,
             })
+        } else if (this.lastTimingState?.key === 'perfect') {
+            MATTER.Body.setAngularVelocity(item.body, item.body.angularVelocity * 0.25)
+            MATTER.Body.applyForce(item.body, item.body.position, {
+                x: (WORLD.tableCenterX - x) * 0.0000014,
+                y: 0.00018,
+            })
+            this.showSparkBurst(x, y + 22, 0xffd65f)
+        } else if (this.lastTimingState?.key === 'good') {
+            MATTER.Body.setAngularVelocity(item.body, item.body.angularVelocity * 0.55)
         }
         this.currentDroppingItem = item
         this.sfx?.place?.play()
@@ -1400,6 +1474,7 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.handleKeyboardInput()
 
         if (this.phase === 'settling') {
+            this.applyPartyEventForces()
             this.checkCollapseOrSettle()
         }
     }
@@ -1560,6 +1635,27 @@ export default class TowerCrashScene extends Phaser.Scene {
         }
     }
 
+    applyPartyEventForces() {
+        const event = this.currentPartyEvent
+        if (!event?.windForce) return
+        const direction = event.windDirection ?? 1
+        this.items.forEach((item) => {
+            if (!item.body || item.body.isStatic) return
+            const yFactor = item.body.position.y < WORLD.tableTopY + 30 ? 1 : 0.35
+            MATTER.Body.applyForce(item.body, item.body.position, {
+                x: event.windForce * direction * yFactor,
+                y: 0,
+            })
+        })
+    }
+
+    getStackHeight() {
+        const active = this.items.filter((item) => item.body && !item.neutral)
+        if (active.length === 0) return 0
+        const top = Math.min(...active.map((item) => item.body.bounds.min.y))
+        return Math.max(0, WORLD.tableTopY - top)
+    }
+
     checkCollapseOrSettle() {
         if (this.time.now - this.dropStartedAt < 520) return
 
@@ -1678,6 +1774,8 @@ export default class TowerCrashScene extends Phaser.Scene {
         if (edgeBonus > 0) messageParts.push(`端 +${edgeBonus}`)
         if (riskyBonus > 0) messageParts.push(`難物 +${riskyBonus}`)
         if (comebackBonus > 0) messageParts.push(`逆転 +${comebackBonus}`)
+        if (eventSurvivalBonus > 0) messageParts.push(`EVENT +${eventSurvivalBonus}`)
+        if (heightBonus > 0) messageParts.push(`高さ +${heightBonus}`)
         if (streakBonus > 0) messageParts.push(`連続 +${streakBonus}`)
         if (feverBonus > 0) messageParts.push(`FEVER +${feverBonus}`)
         if (boostUsed) messageParts.push(`BOOST x${BOOST.multiplier}`)
@@ -1690,6 +1788,9 @@ export default class TowerCrashScene extends Phaser.Scene {
             edgeBonus,
             riskyBonus,
             comebackBonus,
+            eventSurvivalBonus,
+            heightBonus,
+            stackHeight,
             streakBonus,
             feverBonus,
             timingBonus,
@@ -1949,7 +2050,7 @@ export default class TowerCrashScene extends Phaser.Scene {
                 isAnswerChecked,
                 nextButtonLabel: '次の人へ',
                 actionButtonLabel: '置く！',
-                ruleName: 'デスクつみタワー',
+                ruleName: 'デスクつみタワーEX',
                 statusMessage: this.phase === 'select'
                     ? `P${this.currentPlayerIndex + 1}: えらんで おく`
                     : this.phase === 'settling'
@@ -1973,7 +2074,7 @@ export default class TowerCrashScene extends Phaser.Scene {
                 challengeBonus: this.currentChallenge?.bonus ?? 40,
                 partyEventLabel: this.currentPartyEvent?.label ?? '通常ラウンド',
                 partyEventHint: this.roundNumber >= ROUND_DROP.enabledFromRound && this.lastRoundDropLabel
-                    ? `DROP ${this.lastRoundDropLabel}`
+                    ? `${this.currentPartyEvent?.hint ?? 'お題を狙う'} / DROP ${this.lastRoundDropLabel}`
                     : this.currentPartyEvent?.hint ?? 'お題を狙う',
                 roundDropLabel: this.roundNumber >= ROUND_DROP.enabledFromRound
                     ? this.lastRoundDropLabel
@@ -1981,6 +2082,8 @@ export default class TowerCrashScene extends Phaser.Scene {
                 roundItemScale: this.getRoundItemScale(),
                 projectedTurnPoints: pointPreview.total,
                 projectedBonusPoints: pointPreview.bonusTotal,
+                stackHeight: Math.round(this.getStackHeight()),
+                choiceCount: this.currentChoices.length,
                 timingRuleLabel: `PERF +${TIMING.perfectBonus}`,
                 feverLabel: `FVR +${FEVER.bonus}`,
                 feverReady: (this.streaks[this.currentPlayerIndex] ?? 0) >= FEVER.triggerStreak - 1,

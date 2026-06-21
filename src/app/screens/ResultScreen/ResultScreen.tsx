@@ -328,7 +328,7 @@ export default function ResultScreen({ result, onBack }: Props) {
         <header className={`resultHeader ${isRankingVisible ? 'rankingHeader' : 'answerCheckHeader'}`}>
 
           <h1 className={`rankTitle ${isRankingVisible ? '' : 'answerCheckTitle'}`}>
-            {isRankingVisible ? 'デスクつみ結果発表！' : 'プレイ確認'}
+            {isRankingVisible ? 'デスクつみEX 結果発表！' : 'プレイ確認'}
           </h1>
 
           {!isRankingVisible && (

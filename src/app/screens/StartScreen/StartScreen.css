@@ -16,6 +16,17 @@
   color: #1d160f;
 }
 
+.titleScreenFlash {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  background: #fff7bd;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: screenImpactFlash 2.2s ease-out infinite;
+}
+
 .startTitleBlock {
   position: absolute;
   left: 54px;
@@ -63,8 +74,8 @@
   position: absolute;
   left: 50px;
   right: 410px;
-  bottom: 38px;
-  height: 500px;
+  bottom: 30px;
+  height: 488px;
 }
 
 .stationeryPreview {
@@ -73,13 +84,43 @@
   overflow: hidden;
   border: 5px solid #8f5c29;
   border-radius: 28px;
-  background:
-    radial-gradient(circle at 18% 16%, rgba(255,255,255,.75) 0 14px, transparent 15px),
-    linear-gradient(180deg, #cdefff 0 42%, #f9e6ae 42% 70%, #dca464 70% 100%);
+  background: #43cee9;
   box-shadow: 0 12px 0 rgba(97, 53, 0, .22), 0 28px 44px rgba(88, 47, 0, .16);
 }
 
+.stationeryPreview::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  background: url('/assets/title_stage_v2.png') center center / cover no-repeat;
+  transform: scale(1.02);
+  animation: stageBreathe 6s ease-in-out infinite;
+}
+
+.titleConfetti {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.titleConfetti span {
+  position: absolute;
+  left: var(--confetti-x);
+  top: -24px;
+  width: 9px;
+  height: 16px;
+  background: var(--confetti-color);
+  border: 1px solid rgba(69, 44, 14, .22);
+  border-radius: 2px;
+  opacity: 0;
+  animation: confettiFall 3.8s linear infinite;
+  animation-delay: var(--confetti-delay);
+}
+
 .previewSpotlight {
+  z-index: 1;
   position: absolute;
   top: -90px;
   width: 220px;
@@ -104,14 +145,7 @@
 }
 
 .previewSky {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 210px;
-  background:
-    radial-gradient(circle at 72% 18%, rgba(255,255,255,.42) 0 15px, transparent 16px),
-    radial-gradient(circle at 76% 17%, rgba(255,255,255,.25) 0 18px, transparent 19px);
+  display: none;
 }
 
 .previewDesk {
@@ -123,6 +157,7 @@
   background: linear-gradient(180deg, #fff1be, #efbf62);
   border: 5px solid #8b5824;
   border-radius: 20px;
+  z-index: 2;
 }
 
 .previewCursor {
@@ -137,6 +172,7 @@
   border-radius: 22px;
   box-shadow: inset 0 0 0 3px rgba(255,255,255,.28);
   animation: cursorPulse 1.2s ease-in-out infinite;
+  z-index: 2;
 }
 
 .previewRobot {
@@ -147,9 +183,10 @@
   object-fit: contain;
   filter: drop-shadow(0 8px 8px rgba(0,0,0,.16));
   animation: robotBounce 1.7s ease-in-out infinite;
+  z-index: 4;
 }
 
-.previewRobotLeft { left: 88px; }
+.previewRobotLeft { left: 198px; }
 .previewRobotRight { right: 94px; animation-delay: -.7s; }
 
 .previewObject {
@@ -157,6 +194,7 @@
   object-fit: contain;
   filter: drop-shadow(0 8px 8px rgba(0,0,0,.16));
   animation: objectFloat 2.4s ease-in-out infinite;
+  z-index: 3;
 }
 
 .previewBook { width: 154px; left: 315px; bottom: 157px; }
@@ -166,6 +204,56 @@
 .previewRuler { width: 188px; left: 440px; bottom: 282px; transform: rotate(-8deg); animation: rulerFloat 2.8s ease-in-out infinite; }
 .previewBox { width: 98px; right: 130px; bottom: 203px; animation-delay: -1.7s; }
 .previewTape { width: 78px; left: 630px; bottom: 238px; animation-delay: -2s; }
+
+.previewDropObject {
+  position: absolute;
+  top: -88px;
+  z-index: 5;
+  object-fit: contain;
+  opacity: 0;
+  filter: drop-shadow(0 9px 7px rgba(48, 31, 12, .28));
+  transform-origin: center;
+  animation: itemDropImpact 4.4s cubic-bezier(.28, .04, .3, 1) infinite;
+}
+
+.previewDropMug {
+  left: 52%;
+  width: 68px;
+}
+
+.previewDropBattery {
+  left: 37%;
+  width: 58px;
+  animation-delay: -1.47s;
+}
+
+.previewDropEraser {
+  left: 67%;
+  width: 76px;
+  animation-delay: -2.94s;
+}
+
+.previewImpactRing {
+  position: absolute;
+  left: 54%;
+  bottom: 150px;
+  z-index: 4;
+  width: 48px;
+  height: 18px;
+  border: 5px solid #fff4b8;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: impactRing 2.2s ease-out infinite;
+}
+
+.titleFxCanvas {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 
 .previewTargetBadge,
 .previewBoostBadge {
@@ -290,19 +378,61 @@
   line-height: 1;
 }
 
+@keyframes stageBreathe {
+  0%, 100% { transform: scale(1.02) translateY(0); }
+  50% { transform: scale(1.045) translateY(-4px); }
+}
+
+@keyframes screenImpactFlash {
+  0%, 76%, 100% { opacity: 0; }
+  78% { opacity: .2; }
+  82% { opacity: 0; }
+}
+
+@keyframes confettiFall {
+  0% { opacity: 0; transform: translate3d(0, -20px, 0) rotate(0deg); }
+  9% { opacity: .95; }
+  55% { transform: translate3d(22px, 250px, 0) rotate(260deg); }
+  100% { opacity: 0; transform: translate3d(-18px, 530px, 0) rotate(620deg); }
+}
+
 @keyframes titleBadgePop {
   0%, 100% { transform: rotate(-1deg) scale(1); }
   50% { transform: rotate(1deg) scale(1.04); }
 }
 
 @keyframes titlePulse {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%, 65%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    text-shadow: 0 5px 0 #ffffff, 0 9px 0 rgba(92, 52, 13, .18);
+  }
+  72% {
+    transform: translateY(-8px) rotate(-.7deg) scale(1.025);
+    text-shadow: 0 5px 0 #ffffff, 0 9px 0 rgba(92, 52, 13, .18), 0 0 24px rgba(255, 214, 95, .95);
+  }
+  78% { transform: translateY(2px) rotate(.55deg) scale(.99); }
+  84% { transform: translateY(-3px) rotate(-.3deg) scale(1.01); }
 }
 
 @keyframes spotlightSweep {
-  0%, 100% { opacity: .32; transform: rotate(-18deg); }
-  50% { opacity: .68; transform: rotate(18deg); }
+  0%, 100% { opacity: .25; transform: rotate(-22deg) scaleX(.82); }
+  50% { opacity: .74; transform: rotate(22deg) scaleX(1.08); }
+}
+
+@keyframes itemDropImpact {
+  0%, 8% { opacity: 0; transform: translate3d(0, -30px, 0) rotate(-24deg) scale(.86); }
+  12% { opacity: 1; }
+  48% { opacity: 1; transform: translate3d(-8px, 292px, 0) rotate(150deg) scale(1); }
+  53% { transform: translate3d(-8px, 306px, 0) rotate(158deg) scale(1.08, .9); }
+  59% { transform: translate3d(-8px, 284px, 0) rotate(166deg) scale(.98, 1.04); }
+  67% { opacity: 1; transform: translate3d(-8px, 302px, 0) rotate(172deg) scale(1); }
+  82%, 100% { opacity: 0; transform: translate3d(-8px, 302px, 0) rotate(172deg) scale(1); }
+}
+
+@keyframes impactRing {
+  0%, 66% { opacity: 0; transform: translate(-50%, 0) scale(.35); }
+  70% { opacity: .95; }
+  88%, 100% { opacity: 0; transform: translate(-50%, 0) scale(3.4); }
 }
 
 @keyframes robotBounce {
@@ -333,6 +463,29 @@
 @keyframes boostFlash {
   0%, 100% { filter: brightness(1); transform: rotate(-2deg); }
   50% { filter: brightness(1.25); transform: rotate(2deg) scale(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .titleScreenFlash,
+  .titleConfetti span,
+  .stationeryPreview::before,
+  .previewSpotlight,
+  .previewRobot,
+  .previewObject,
+  .previewDropObject,
+  .previewImpactRing,
+  .previewTargetBadge,
+  .previewBoostBadge,
+  .previewCursor,
+  .startBadge,
+  .startTitleBlock h1 {
+    animation: none;
+  }
+
+  .previewDropObject,
+  .previewImpactRing {
+    display: none;
+  }
 }
 
 .difficultyDock {
