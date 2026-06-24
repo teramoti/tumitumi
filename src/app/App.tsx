@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react'
 import StartScreen from './screens/StartScreen/StartScreen'
 import ResultScreen from './screens/ResultScreen/ResultScreen'
+import { getGameManagerPlayerCount } from '../game/GameManager'
 
 const GameScreen = lazy(() => import('./screens/GameScreen/GameScreen'))
 
@@ -23,6 +24,14 @@ export type PlayerResult = {
   player: number
   score: number
   review?: PlayerReview
+  hp?: number
+  alive?: boolean
+  successes?: number
+  misses?: number
+  dropPoints?: number
+  survivalBonus?: number
+  hpBonus?: number
+  missPenalty?: number
 }
 
 export type GameResult = {
@@ -34,6 +43,14 @@ type LoosePlayerResult = {
   playerNumber?: number
   score?: number
   review?: PlayerReview
+  hp?: number
+  alive?: boolean
+  successes?: number
+  misses?: number
+  dropPoints?: number
+  survivalBonus?: number
+  hpBonus?: number
+  missPenalty?: number
 }
 
 type RawGameResult = GameResult | {
@@ -47,7 +64,15 @@ function normalizeGameResult(raw: RawGameResult): GameResult {
       .map((entry, index) => ({
         player: entry.player ?? (('playerNumber' in entry) ? entry.playerNumber : undefined) ?? index + 1,
         score: typeof entry.score === 'number' ? entry.score : 0,
-        review: entry.review
+        review: entry.review,
+        hp: entry.hp,
+        alive: entry.alive,
+        successes: entry.successes,
+        misses: entry.misses,
+        dropPoints: entry.dropPoints,
+        survivalBonus: entry.survivalBonus,
+        hpBonus: entry.hpBonus,
+        missPenalty: entry.missPenalty
       }))
       .sort((a, b) => {
         if (b.score !== a.score) return b.score - a.score
@@ -78,9 +103,13 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('start')
   const [settings, setSettings] = useState<GameSettings | null>(null)
   const [result, setResult] = useState<GameResult | null>(null)
+  const playerCount = getGameManagerPlayerCount()
 
-  const handleStart = (nextSettings: GameSettings) => {
-    setSettings(nextSettings)
+  const handleStart = (nextSettings: Omit<GameSettings, 'playerCount'>) => {
+    setSettings({
+      ...nextSettings,
+      playerCount
+    })
     setScreen('game')
   }
 
@@ -98,7 +127,7 @@ export default function App() {
   return (
     <>
       {screen === 'start' && (
-        <StartScreen onStart={handleStart} />
+        <StartScreen playerCount={playerCount} onStart={handleStart} />
       )}
 
       {screen === 'game' && settings && (

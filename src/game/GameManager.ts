@@ -4,6 +4,18 @@ import TowerCrashScene, { configureTowerCrashScene } from './towerCrash/TowerCra
 import type { GameResult } from '../app/App'
 import type { Difficulty } from '../app/data/gameRules'
 
+export const DEFAULT_PLAYER_COUNT = 4
+
+export function normalizePlayerCount(value: unknown): number {
+  const count = Number(value)
+  if (!Number.isFinite(count)) return DEFAULT_PLAYER_COUNT
+  return Math.max(1, Math.min(4, Math.floor(count)))
+}
+
+export function getGameManagerPlayerCount(value?: unknown): number {
+  return normalizePlayerCount(value ?? DEFAULT_PLAYER_COUNT)
+}
+
 type GameSettings = {
   playerCount: number
   hudTarget?: EventTarget
@@ -17,9 +29,11 @@ export function startGame(
   settings: GameSettings,
   onFinish: (result: GameResult) => void
 ) {
-  const { playerCount, difficulty } = settings
+  const { difficulty } = settings
+  const playerCount = normalizePlayerCount(settings.playerCount)
+  const normalizedSettings = { ...settings, playerCount }
 
-  configureTowerCrashScene(settings, onFinish)
+  configureTowerCrashScene(normalizedSettings, onFinish)
 
   game = new Phaser.Game({
     type: Phaser.AUTO,

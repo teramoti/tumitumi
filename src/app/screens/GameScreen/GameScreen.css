@@ -391,3 +391,56 @@
 .gameHudButton:disabled {
   filter: grayscale(0.15);
 }
+
+.laneMiniBadgeAttack {
+  color: #ffffff;
+  background: #ffe0da;
+  border-color: #ef5947;
+  box-shadow: 0 0 0 3px rgba(239, 89, 71, 0.18);
+}
+
+.laneMiniBadgeAttack span,
+.laneMiniBadgeAttack strong {
+  color: #9d2f23;
+}
+
+.keyboardOnlyPanel {
+  width: 100%;
+  min-height: 58px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  color: #ffffff;
+  font-weight: 1000;
+  letter-spacing: .06em;
+  box-shadow: 0 6px 0 rgba(126, 35, 28, 0.65);
+  user-select: none;
+  pointer-events: none;
+}
+
+.keyboardOnlyPanel span {
+  font-size: 13px;
+  opacity: .92;
+}
+
+.keyboardOnlyPanel strong {
+  font-size: 22px;
+  line-height: 1.05;
+}
+
+.keyboardOnlyReady {
+  background: linear-gradient(180deg, #ef5d4d, #ca3325);
+}
+
+.keyboardOnlyNext {
+  background: linear-gradient(180deg, #4bc57f, #22864d);
+  box-shadow: 0 6px 0 rgba(27, 88, 49, 0.7);
+}
+
+.keyboardOnlyLocked {
+  background: linear-gradient(180deg, #9aa3ad, #65707a);
+  box-shadow: 0 6px 0 rgba(64, 72, 80, 0.62);
+}

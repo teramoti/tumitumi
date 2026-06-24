@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './GameScreen.css'
 const gameBgm = '/assets/game_bgm.wav'
-import { playClickSound } from '../../audio/playClickSound'
 import { destroyGame, startGame } from '../../../game/GameManager'
 import { DIFFICULTY_LABELS, getMaxTurns, PLAYER_START_HP, type Difficulty } from '../../data/gameRules'
 import type { GameSettings, GameResult } from '../../App'
@@ -46,20 +45,15 @@ const PLAYER_MARKER_IMAGE_PATHS = [
 ]
 
 const ITEM_IMAGE_PATHS: Record<string, string> = {
-  kumiNormal: '/assets/kumi_block_normal.png',
-  kumiWide: '/assets/kumi_block_wide.png',
-  kumiLight: '/assets/kumi_block_light.png',
-  kumiRisky: '/assets/kumi_block_risky.png',
-  kumiGuard: '/assets/kumi_block_guard.png',
-  book: '/assets/item_book.png',
-  eraser: '/assets/item_eraser.png',
-  can: '/assets/item_smallCan.png',
-  mug: '/assets/item_mug.png',
-  tape: '/assets/item_tape.png',
-  battery: '/assets/item_battery.png',
-  ruler: '/assets/item_ruler.png',
-  box: '/assets/item_box.png',
-  drop: '/assets/item_smallCan.png'
+  cat: '/assets/animal_cat.png',
+  dog: '/assets/animal_dog.png',
+  panda: '/assets/animal_panda.png',
+  turtle: '/assets/animal_turtle.png',
+  penguin: '/assets/animal_penguin.png',
+  elephant: '/assets/animal_elephant.png',
+  giraffe: '/assets/animal_giraffe.png',
+  seal: '/assets/animal_seal.png',
+  drop: '/assets/animal_cat.png'
 }
 
 function Hearts({ hp, alive }: { hp: number, alive: boolean }) {
@@ -90,11 +84,11 @@ export default function GameScreen({ settings, onFinish }: Props) {
     timeLeft: getMaxTurns(difficultyForInit),
     isAnswerChecked: false,
     nextButtonLabel: '次の人へ',
-    actionButtonLabel: '落とす！',
-    ruleName: '逆ジェンガバトル',
-    selectedItemLabel: '落下 1個',
+    actionButtonLabel: 'つむ！',
+    ruleName: 'どうぶつタワーバトル',
+    selectedItemLabel: 'どうぶつ x1',
     selectedItemDescription: 'DROP x1',
-    selectedItemKey: 'can',
+    selectedItemKey: 'cat',
     selectedLaneIndex: 3,
     aliveCount: settings.playerCount,
     difficultyLabel: DIFFICULTY_LABELS[difficultyForInit],
@@ -157,15 +151,9 @@ export default function GameScreen({ settings, onFinish }: Props) {
     }
   }, [])
 
-  const sendGameCommand = (type: 'answer' | 'next') => {
-    playClickSound()
-    hudTargetRef.current.dispatchEvent(new CustomEvent('game-command', {
-      detail: { type }
-    }))
-  }
 
   const progressRatio = Math.max(0, Math.min(1, hud.turnNumber / Math.max(1, hud.maxTurns)))
-  const selectedItemImage = ITEM_IMAGE_PATHS[hud.selectedItemKey ?? 'book'] ?? ITEM_IMAGE_PATHS.book
+  const selectedItemImage = ITEM_IMAGE_PATHS[hud.selectedItemKey ?? 'cat'] ?? ITEM_IMAGE_PATHS.cat
 
   return (
     <div className="gameScreenShell">
@@ -177,7 +165,7 @@ export default function GameScreen({ settings, onFinish }: Props) {
           <div className="hudCornerTape hudCornerTapeRight" aria-hidden="true" />
 
           <div className="miniHudTopRow">
-            <span className="miniHudBadge">{hud.ruleName || '逆ジェンガバトル'}</span>
+            <span className="miniHudBadge">{hud.ruleName || 'どうぶつタワーバトル'}</span>
             <span className="miniHudDifficulty">{hud.difficultyLabel}</span>
           </div>
 
@@ -194,20 +182,20 @@ export default function GameScreen({ settings, onFinish }: Props) {
                 <span className="turnHeroChip turnHeroCombo">C{hud.combo}</span>
               </div>
               <p className="turnHeroPlayer">P{hud.currentPlayerIndex + 1} TURN</p>
-              <p className="turnHeroText">{hud.isAnswerChecked ? 'つぎへ' : '落とす場所をねらう'}</p>
+              <p className="turnHeroText">{hud.isAnswerChecked ? 'つぎへ' : '場所をねらう'}</p>
             </div>
           </section>
 
           <div className="miniStatusRow">
             <div className="selectedItemMiniCard">
-              <img className="selectedItemMiniImage" src={selectedItemImage} alt={hud.selectedItemLabel ?? '落下物'} />
+              <img className="selectedItemMiniImage" src={selectedItemImage} alt={hud.selectedItemLabel ?? 'どうぶつ'} />
               <div className="selectedItemMiniText">
-                <strong>{hud.selectedItemLabel ?? '落下物'}</strong>
+                <strong>{hud.selectedItemLabel ?? 'どうぶつ'}</strong>
               </div>
             </div>
-            <div className={`laneMiniBadge ${hud.selectedItemDescription === 'BONUS' ? 'laneMiniBadgeBonus' : ''} ${hud.selectedItemDescription === 'FEVER' ? 'laneMiniBadgeFever' : ''} ${hud.selectedItemDescription?.startsWith('DROP') ? 'laneMiniBadgeDrop' : ''}`}>
-              <span>{hud.selectedItemDescription === 'BONUS' ? 'BONUS' : hud.selectedItemDescription === 'FEVER' ? 'FEVER' : hud.selectedItemDescription?.startsWith('DROP') ? 'DROP' : 'L'}</span>
-              <strong>{hud.selectedLaneIndex ?? 3}</strong>
+            <div className={`laneMiniBadge ${hud.selectedItemDescription === 'BONUS' ? 'laneMiniBadgeBonus' : ''} ${hud.selectedItemDescription === 'FEVER' ? 'laneMiniBadgeFever' : ''} ${hud.selectedItemDescription?.startsWith('DROP') || hud.selectedItemDescription === 'ROUND DROP' ? 'laneMiniBadgeDrop' : ''} ${hud.selectedItemDescription?.startsWith('ATTACK') ? 'laneMiniBadgeAttack' : ''}`}>
+              <span>{hud.selectedItemDescription === 'BONUS' ? 'BONUS' : hud.selectedItemDescription === 'FEVER' ? 'FEVER' : hud.selectedItemDescription === 'ROUND DROP' ? 'ROUND' : hud.selectedItemDescription?.startsWith('ATTACK') ? 'ATK' : hud.selectedItemDescription?.startsWith('DROP') ? 'DROP' : 'TARGET'}</span>
+              <strong>{hud.selectedItemDescription?.startsWith('ATTACK') ? hud.selectedItemDescription.replace('ATTACK ', '') : '← →'}</strong>
             </div>
           </div>
 
@@ -215,7 +203,7 @@ export default function GameScreen({ settings, onFinish }: Props) {
             <span style={{ width: `${progressRatio * 100}%` }} />
           </div>
 
-          <img className="controlsSticker" src="/assets/ui_controls_hint.png" alt="操作説明" />
+          <img className="controlsSticker" src="/assets/ui_controls_animal.png" alt="操作説明" />
 
           <section className="miniPlayersSection" aria-label="プレイヤーHP">
             <div className="miniPlayersHeader">
@@ -242,14 +230,10 @@ export default function GameScreen({ settings, onFinish }: Props) {
             </div>
           </section>
 
-          <button
-            className={`gameHudButton ${hud.isActionLocked ? 'gameHudLockedButton' : hud.isAnswerChecked ? 'gameHudNextButton' : 'gameHudAnswerButton'}`}
-            type="button"
-            disabled={hud.isActionLocked}
-            onClick={() => sendGameCommand(hud.isAnswerChecked ? 'next' : 'answer')}
-          >
-            {hud.isAnswerChecked ? hud.nextButtonLabel : (hud.actionButtonLabel || '落とす！')}
-          </button>
+          <div className={`keyboardOnlyPanel ${hud.isActionLocked ? 'keyboardOnlyLocked' : hud.isAnswerChecked ? 'keyboardOnlyNext' : 'keyboardOnlyReady'}`} aria-label="キーボード操作">
+            <span>{hud.isAnswerChecked ? 'SPACE / ENTER' : '← →  W S'}</span>
+            <strong>{hud.isAnswerChecked ? hud.nextButtonLabel : 'SPACE つむ'}</strong>
+          </div>
         </aside>
       </div>
     </div>
