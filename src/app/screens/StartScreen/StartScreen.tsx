@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './StartScreen.css'
 
 const startBgm = '/assets/start_bgm.wav'
@@ -15,163 +15,42 @@ type Props = {
 }
 
 const difficultyDescriptions: Record<Difficulty, string> = {
-  easy: '安定雑貨中心',
-  normal: '標準セット',
-  hard: '危険雑貨多め'
+  easy: 'やさしめ / 最大16ターン',
+  normal: 'ふつう / 最大20ターン',
+  hard: 'ぐらぐら / 最大24ターン'
 }
 
 const howToSlides = [
   {
-    title: '雑貨を選ぶ',
-    body: '毎ターン4〜5個の候補から1つを選ぶ。重いもの、転がるもの、細いものは点が高い。',
-    command: '↑ ↓'
+    title: '遊び方 1/3',
+    body: '落とす場所をねらう',
+    image: '/assets/ui_battle_howto_1.png'
   },
   {
-    title: '置き位置を決める',
-    body: '左右キーでカーソルを動かす。TARGETに近いほど追加点を狙える。',
-    command: '← →'
+    title: '遊び方 2/3',
+    body: '上から落とす',
+    image: '/assets/ui_battle_howto_2.png'
   },
   {
-    title: 'BOOSTとタイミング',
-    body: 'Bで1回だけBOOST。SPACEで置く。PERFECTなら追加点だけでなく、物理的にも少し安定する。2周目から障害物が落ちる。',
-    command: 'B / SPACE'
+    title: '遊び方 3/3',
+    body: 'ラウンドごとに増える',
+    image: '/assets/ui_battle_howto_3.png'
   }
 ]
-
-const difficulties: Difficulty[] = ['easy', 'normal', 'hard']
-
-const CONFETTI_COLORS = ['#ef5947', '#ffd65f', '#2aa7a3', '#4b72d9', '#ffffff']
-
-function TitleFxCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const context = canvas.getContext('2d')
-    if (!context) return
-
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const colors = ['#ef5947', '#ffd65f', '#2aa7a3', '#4b72d9', '#ffffff']
-    let animationFrame = 0
-    let lastFrame = 0
-
-    const drawStar = (x: number, y: number, radius: number, rotation: number, color: string, alpha: number) => {
-      context.save()
-      context.translate(x, y)
-      context.rotate(rotation)
-      context.globalAlpha = alpha
-      context.fillStyle = color
-      context.beginPath()
-      for (let point = 0; point < 10; point += 1) {
-        const angle = -Math.PI / 2 + point * Math.PI / 5
-        const distance = point % 2 === 0 ? radius : radius * 0.42
-        context.lineTo(Math.cos(angle) * distance, Math.sin(angle) * distance)
-      }
-      context.closePath()
-      context.fill()
-      context.restore()
-    }
-
-    const render = (time: number) => {
-      animationFrame = window.requestAnimationFrame(render)
-      if (time - lastFrame < 33) return
-      lastFrame = time
-
-      const ratio = Math.min(window.devicePixelRatio || 1, 1.5)
-      const width = canvas.clientWidth
-      const height = canvas.clientHeight
-      if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
-        canvas.width = Math.round(width * ratio)
-        canvas.height = Math.round(height * ratio)
-      }
-      context.setTransform(ratio, 0, 0, ratio, 0, 0)
-      context.clearRect(0, 0, width, height)
-
-      const cycle = reduceMotion ? 0.18 : (time % 2200) / 2200
-      const originX = width * 0.54
-      const originY = height * 0.68
-      const fade = Math.max(0, 1 - cycle)
-
-      context.save()
-      context.globalAlpha = fade * 0.8
-      context.lineWidth = 5
-      context.strokeStyle = '#fff4b8'
-      context.beginPath()
-      context.arc(originX, originY, 26 + cycle * 150, 0, Math.PI * 2)
-      context.stroke()
-      context.restore()
-
-      for (let index = 0; index < 22; index += 1) {
-        const angle = -Math.PI * 0.92 + index * (Math.PI * 1.84 / 21)
-        const speed = 92 + (index % 6) * 18
-        const distance = 20 + speed * cycle
-        const x = originX + Math.cos(angle) * distance
-        const y = originY + Math.sin(angle) * distance + cycle * cycle * 82
-        const color = colors[index % colors.length]
-        if (index % 5 === 0) {
-          drawStar(x, y, 7 + (index % 3) * 2, cycle * 5 + index, color, fade)
-        } else {
-          context.save()
-          context.globalAlpha = fade
-          context.strokeStyle = color
-          context.lineWidth = 4
-          context.lineCap = 'round'
-          context.beginPath()
-          context.moveTo(x, y)
-          context.lineTo(x - Math.cos(angle) * 14, y - Math.sin(angle) * 14)
-          context.stroke()
-          context.restore()
-        }
-      }
-
-      if (reduceMotion) window.cancelAnimationFrame(animationFrame)
-    }
-
-    animationFrame = window.requestAnimationFrame(render)
-    return () => window.cancelAnimationFrame(animationFrame)
-  }, [])
-
-  return <canvas className="titleFxCanvas" ref={canvasRef} />
-}
 
 function TowerPreview() {
   return (
     <div className="stationeryPreview" aria-hidden="true">
-      <div className="previewSky" />
-      <div className="titleConfetti">
-        {Array.from({ length: 18 }, (_, index) => (
-          <span
-            key={index}
-            style={{
-              '--confetti-x': `${3 + ((index * 37) % 94)}%`,
-              '--confetti-delay': `${-(index * 0.29)}s`,
-              '--confetti-color': CONFETTI_COLORS[index % CONFETTI_COLORS.length]
-            } as CSSProperties}
-          />
-        ))}
-      </div>
-      <div className="previewSpotlight previewSpotlightLeft" />
-      <div className="previewSpotlight previewSpotlightRight" />
-      <img className="previewRobot previewRobotLeft" src="/assets/char_robot_p1.png" alt="" />
-      <img className="previewRobot previewRobotRight" src="/assets/char_robot_p2.png" alt="" />
-      <img className="previewObject previewBook" src="/assets/item_book.png" alt="" />
-      <img className="previewObject previewNotebook" src="/assets/item_notebook.png" alt="" />
-      <img className="previewObject previewCan" src="/assets/item_smallCan.png" alt="" />
-      <img className="previewObject previewEraser" src="/assets/item_eraser.png" alt="" />
-      <img className="previewObject previewRuler" src="/assets/item_ruler.png" alt="" />
-      <img className="previewObject previewBox" src="/assets/item_box.png" alt="" />
-      <img className="previewObject previewTape" src="/assets/item_tape.png" alt="" />
-      <img className="previewDropObject previewDropMug" src="/assets/item_mug.png" alt="" />
-      <img className="previewDropObject previewDropBattery" src="/assets/item_battery.png" alt="" />
-      <img className="previewDropObject previewDropEraser" src="/assets/item_eraser.png" alt="" />
-      <div className="previewTargetBadge">TARGET</div>
-      <div className="previewBoostBadge">BOOST x2.5</div>
-      <div className="previewCursor" />
+      <img className="previewMarker previewMarkerLeft" src="/assets/player_badge_p1.png" alt="" />
+      <img className="previewMarker previewMarkerRight" src="/assets/player_badge_p2.png" alt="" />
+      <img className="previewObject previewBook" src="/assets/kumi_block_wide.png" alt="" />
+      <img className="previewObject previewNotebook" src="/assets/kumi_block_normal.png" alt="" />
+      <img className="previewObject previewCan" src="/assets/kumi_block_light.png" alt="" />
+      <img className="previewObject previewEraser" src="/assets/kumi_block_risky.png" alt="" />
+      <img className="previewObject previewRuler" src="/assets/kumi_block_guard.png" alt="" />
+      <img className="previewObject previewBox" src="/assets/kumi_block_normal.png" alt="" />
+      <img className="previewObject previewCore" src="/assets/tower_core.png" alt="" />
       <div className="previewDesk" />
-      <div className="previewImpactRing" />
-      <TitleFxCanvas />
     </div>
   )
 }
@@ -179,8 +58,11 @@ function TowerPreview() {
 export default function StartScreen({ onStart }: Props) {
   const [playerCount, setPlayerCount] = useState(4)
   const [difficulty, setDifficulty] = useState<Difficulty>('normal')
+  const [isPlayerCountFixed, setIsPlayerCountFixed] = useState(false)
   const [isHowToOpen, setIsHowToOpen] = useState(false)
+  const [isDifficultyDialogOpen, setIsDifficultyDialogOpen] = useState(false)
   const [howToIndex, setHowToIndex] = useState(0)
+  const isPlayerCountFixedRef = useRef(false)
 
   useEffect(() => {
     const audio = new Audio(startBgm)
@@ -193,9 +75,11 @@ export default function StartScreen({ onStart }: Props) {
     }
 
     playBgm()
+    window.addEventListener('pointerdown', playBgm, { once: true })
     window.addEventListener('keydown', playBgm, { once: true })
 
     return () => {
+      window.removeEventListener('pointerdown', playBgm)
       window.removeEventListener('keydown', playBgm)
       audio.pause()
       audio.currentTime = 0
@@ -210,10 +94,13 @@ export default function StartScreen({ onStart }: Props) {
     if (!Number.isNaN(queryPlayerCount) && queryPlayerCount >= 1) {
       const normalizedCount = Math.min(4, queryPlayerCount)
       setPlayerCount(normalizedCount)
+      setIsPlayerCountFixed(true)
+      isPlayerCountFixedRef.current = true
     }
 
     const handler = (event: MessageEvent) => {
       if (event.data?.type !== 'SET_PLAYER_COUNT') return
+      if (isPlayerCountFixedRef.current) return
 
       const count = Number(event.data.playerCount)
       if (!Number.isNaN(count) && count >= 1) {
@@ -229,198 +116,166 @@ export default function StartScreen({ onStart }: Props) {
     }
   }, [])
 
-  useEffect(() => {
-    const moveDifficulty = (direction: number) => {
-      setDifficulty((current) => {
-        const currentIndex = difficulties.indexOf(current)
-        const nextIndex = (currentIndex + direction + difficulties.length) % difficulties.length
-        return difficulties[nextIndex]
-      })
-    }
-
-    const moveHowTo = (direction: number) => {
-      setHowToIndex((current) => Math.max(0, Math.min(howToSlides.length - 1, current + direction)))
-    }
-
-    const handler = (event: KeyboardEvent) => {
-      const key = event.key
-      const isConfirmKey = key === ' ' || key === 'Space' || key === 'Spacebar' || key === 'Enter'
-
-      if (isHowToOpen) {
-        if (['ArrowLeft', 'ArrowUp'].includes(key)) {
-          event.preventDefault()
-          playClickSound()
-          moveHowTo(-1)
-          return
-        }
-
-        if (['ArrowRight', 'ArrowDown'].includes(key) || isConfirmKey) {
-          event.preventDefault()
-          playClickSound()
-          if (howToIndex >= howToSlides.length - 1) {
-            setIsHowToOpen(false)
-          } else {
-            moveHowTo(1)
-          }
-          return
-        }
-
-        if (key === 'Escape') {
-          event.preventDefault()
-          playClickSound()
-          setIsHowToOpen(false)
-        }
-        return
-      }
-
-      if (key === 'ArrowUp') {
-        event.preventDefault()
-        playClickSound()
-        moveDifficulty(-1)
-        return
-      }
-
-      if (key === 'ArrowDown') {
-        event.preventDefault()
-        playClickSound()
-        moveDifficulty(1)
-        return
-      }
-
-      if (key === 'ArrowLeft') {
-        event.preventDefault()
-        playClickSound()
-        moveDifficulty(-1)
-        return
-      }
-
-      if (key === 'ArrowRight') {
-        event.preventDefault()
-        playClickSound()
-        moveDifficulty(1)
-        return
-      }
-
-      if (!event.repeat && isConfirmKey) {
-        event.preventDefault()
-        playClickSound()
-        onStart({ playerCount, difficulty })
-        return
-      }
-
-      if (!event.repeat && key.toLowerCase() === 'h') {
-        event.preventDefault()
-        playClickSound()
-        setHowToIndex(0)
-        setIsHowToOpen(true)
-      }
-    }
-
-    window.addEventListener('keydown', handler)
-
-    return () => {
-      window.removeEventListener('keydown', handler)
-    }
-  }, [difficulty, howToIndex, isHowToOpen, onStart, playerCount])
-
-  const maxTurns = getMaxTurns(difficulty, playerCount)
+  const maxTurns = getMaxTurns(difficulty)
 
   return (
-    <div className="startShell">
-      <main className="startStage">
-        <div className="titleScreenFlash" aria-hidden="true" />
-        <header className="startTitleBlock">
-          <span className="startBadge">DESK STACK EX</span>
-          <h1>デスクつみタワーEX</h1>
-          <p>短い足場で一気に勝負するターン制バランスゲーム</p>
+    <div className="backColor startScreenYellowBackground">
+      <div className="startScreen richStartPanel">
+        <header className="titleArea richTitleArea">
+          <img className="titleLogoImage" src="/assets/ui_battle_title.png" alt="逆ジェンガバトル" />
         </header>
 
-        <section className="startPreviewArea" aria-label="ゲームプレビュー">
-          <TowerPreview />
-          <div className="startRuleRibbon" aria-label="基本操作">
-            <span>↑↓ SELECT</span>
-            <span>←→ AIM</span>
-            <span>B BOOST</span>
-            <span>SPACE DROP</span>
+        <section className="startMainArea compactStartMainArea">
+          <div className="previewCard compactPreviewCard">
+            <TowerPreview />
+            <img className="startRuleSticker" src="/assets/ui_battle_rule.png" alt="場所を選ぶ、落とす、たえる" />
+          </div>
+
+          <div className="settingCard compactSettingCard">
+            <div className="playerSetting compactBlock">
+              <label className="label">プレイヤー</label>
+              <div className="playerCountRow compactPlayerRow">
+                <p className="playerCount">{playerCount} 人</p>
+                {!isPlayerCountFixed && (
+                  <input
+                    className="numberInput"
+                    type="number"
+                    min={1}
+                    max={4}
+                    value={playerCount}
+                    onChange={(event) => {
+                      setPlayerCount(Math.max(1, Math.min(4, Number(event.target.value) || 1)))
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="difficultySetting compactBlock">
+              <label className="label">難易度</label>
+              <button
+                className="difficultyOpenButton"
+                type="button"
+                onClick={() => {
+                  playClickSound()
+                  setIsDifficultyDialogOpen(true)
+                }}
+              >
+                {DIFFICULTY_LABELS[difficulty]}
+              </button>
+              <p className="difficultyCaption">
+                {difficultyDescriptions[difficulty]} / {maxTurns}ターン
+              </p>
+            </div>
+
+            <div className="buttonArea compactButtonArea">
+              <button
+                className="startButton"
+                type="button"
+                onClick={() => {
+                  playClickSound()
+                  onStart({ playerCount, difficulty })
+                }}
+              >
+                START
+              </button>
+
+              <button
+                className="howToButton"
+                type="button"
+                onClick={() => {
+                  playClickSound()
+                  setHowToIndex(0)
+                  setIsHowToOpen(true)
+                }}
+              >
+                HOW TO
+              </button>
+            </div>
           </div>
         </section>
 
-        <aside className="startControlDock" aria-label="ゲーム設定">
-          <div className="startDockTop">
-            <span>PLAYERS</span>
-            <strong>{playerCount}</strong>
-            <em>GAME MANAGER</em>
-          </div>
-
-          <div className="difficultyDock">
-            {(['easy', 'normal', 'hard'] as Difficulty[]).map((level) => (
-              <div
-                className={`difficultyDockItem ${difficulty === level ? 'difficultyDockItemActive' : ''}`}
-                key={level}
-              >
-                <strong>{DIFFICULTY_LABELS[level]}</strong>
-                <span>{difficultyDescriptions[level]}</span>
+        {isDifficultyDialogOpen && (
+          <div className="difficultyDialogLayer" role="presentation">
+            <div className="difficultyDialog" role="dialog" aria-modal="true" aria-label="難易度選択">
+              <h2>難易度を選ぶ</h2>
+              <div className="difficultyChoiceList">
+                {(['easy', 'normal', 'hard'] as Difficulty[]).map((level) => (
+                  <button
+                    className={`difficultyChoiceButton ${difficulty === level ? 'difficultyChoiceSelected' : ''}`}
+                    type="button"
+                    key={level}
+                    onClick={() => {
+                      playClickSound()
+                      setDifficulty(level)
+                      setIsDifficultyDialogOpen(false)
+                    }}
+                  >
+                    <strong>{DIFFICULTY_LABELS[level]}</strong>
+                    <span>{difficultyDescriptions[level]}</span>
+                  </button>
+                ))}
               </div>
-            ))}
+              <button
+                className="difficultyDialogClose"
+                type="button"
+                onClick={() => {
+                  playClickSound()
+                  setIsDifficultyDialogOpen(false)
+                }}
+              >
+                とじる
+              </button>
+            </div>
           </div>
-
-          <div className="turnInfoPanel">
-            <span>最大ターン</span>
-            <strong>{maxTurns}</strong>
-          </div>
-
-          <div
-            className="startPrimaryButton"
-          >
-            SPACE / ENTER
-          </div>
-
-          <div
-            className="startSubButton"
-          >
-            H HOW TO
-          </div>
-        </aside>
+        )}
 
         {isHowToOpen && (
           <div className="howToLayer" role="presentation">
             <div className="howToDialog" role="dialog" aria-modal="true" aria-label="遊び方">
-              <div className="howToHeader">
-                <span>{howToIndex + 1}/3</span>
-                <h2>{howToSlides[howToIndex].title}</h2>
-              </div>
-
-              <div className="howToCommand">
-                <strong>{howToSlides[howToIndex].command}</strong>
-              </div>
-
+              <h2>{howToSlides[howToIndex].title}</h2>
+              <img className="howToImage" src={howToSlides[howToIndex].image} alt={howToSlides[howToIndex].body} />
               <p>{howToSlides[howToIndex].body}</p>
-
               <div className="howToNavRow">
-                <div
+                <button
                   className="howToNav"
-                  aria-disabled={howToIndex === 0}
+                  type="button"
+                  disabled={howToIndex === 0}
+                  onClick={() => {
+                    playClickSound()
+                    setHowToIndex((value) => Math.max(0, value - 1))
+                  }}
                 >
                   まえ
-                </div>
+                </button>
                 {howToIndex < howToSlides.length - 1 ? (
-                  <div
-                    className="howToNav howToNavPrimary"
+                  <button
+                    className="howToNav"
+                    type="button"
+                    onClick={() => {
+                      playClickSound()
+                      setHowToIndex((value) => Math.min(howToSlides.length - 1, value + 1))
+                    }}
                   >
                     つぎ
-                  </div>
+                  </button>
                 ) : (
-                  <div
-                    className="howToNav howToNavPrimary"
+                  <button
+                    className="howToClose"
+                    type="button"
+                    onClick={() => {
+                      playClickSound()
+                      setIsHowToOpen(false)
+                    }}
                   >
                     とじる
-                  </div>
+                  </button>
                 )}
               </div>
             </div>
           </div>
         )}
-      </main>
+      </div>
     </div>
   )
 }

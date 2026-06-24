@@ -47,8 +47,8 @@
   top: 18px;
   left: 18px;
   z-index: 10;
-  width: 270px;
-  padding: 12px;
+  width: 276px;
+  padding: 12px 12px 14px;
   color: #1d1407;
   background: rgba(255, 249, 237, 0.96);
   border: 4px solid #7f5527;
@@ -59,7 +59,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   backdrop-filter: blur(2px);
 }
 
@@ -106,8 +106,7 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 1000;
-  letter-spacing: 0;
-  white-space: nowrap;
+  letter-spacing: .08em;
 }
 
 .miniHudBadge {
@@ -124,19 +123,19 @@
 
 .turnHeroCard {
   display: grid;
-  grid-template-columns: 58px 1fr;
-  gap: 8px;
+  grid-template-columns: 72px 1fr;
+  gap: 10px;
   align-items: center;
-  padding: 8px;
+  padding: 10px;
   background: linear-gradient(180deg, #ffffff, #fff0b9);
   border: 3px solid #b57a2e;
   border-radius: 20px;
   box-shadow: inset 0 -8px 0 rgba(196, 143, 47, 0.12);
 }
 
-.turnHeroRobot {
-  width: 58px;
-  height: 58px;
+.turnHeroMarker {
+  width: 72px;
+  height: 72px;
   object-fit: contain;
   background: rgba(255,255,255,.7);
   border: 2px solid rgba(150, 101, 35, 0.22);
@@ -146,7 +145,7 @@
 .turnHeroPlayer {
   margin: 4px 0 1px;
   color: #1d1b19;
-  font-size: 23px;
+  font-size: 28px;
   line-height: 1;
   font-weight: 1000;
 }
@@ -162,74 +161,37 @@
   flex: 1;
   min-width: 0;
   display: grid;
-  grid-template-columns: 46px 1fr;
+  grid-template-columns: 54px 1fr;
   align-items: center;
-  gap: 7px;
-  padding: 7px;
+  gap: 8px;
+  padding: 8px 10px;
   background: rgba(255,255,255,.92);
   border: 2px solid #d9b57a;
   border-radius: 16px;
 }
 
 .selectedItemMiniImage {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
-}
-
-.selectedItemFallback {
-  width: 46px;
-  height: 46px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  border: 2px solid rgba(38, 38, 38, .4);
-  border-radius: 12px;
-  box-shadow: inset 0 -5px 0 rgba(0,0,0,.12);
-  font-size: 11px;
-  line-height: 1;
-  font-weight: 1000;
 }
 
 .selectedItemMiniText {
   min-width: 0;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3px;
+  align-items: center;
 }
 
 .selectedItemMiniText strong,
 .laneMiniBadge strong {
   color: #1b1b1b;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
-}
-
-.selectedItemMiniText span,
-.laneMiniBadge span {
-  color: #6c4b12;
-  font-size: 10px;
-  font-weight: 900;
-  line-height: 1.1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.laneMiniBadge em {
-  color: #8b5d24;
-  font-size: 10px;
-  line-height: 1;
-  font-style: normal;
-  font-weight: 1000;
 }
 
 .laneMiniBadge {
-  width: 70px;
-  min-height: 64px;
-  padding: 7px 9px;
+  width: 76px;
+  padding: 8px 10px;
   background: rgba(255,255,255,.92);
   border: 2px solid #d9b57a;
   border-radius: 16px;
@@ -238,97 +200,6 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-}
-
-.scoreStrip {
-  display: grid;
-  grid-template-columns: .85fr 1fr 1fr;
-  gap: 5px;
-}
-
-.scoreStrip span {
-  min-height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #174d2c;
-  background: #ebfff3;
-  border: 2px solid #98cfaa;
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: 1000;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.scoreStrip .scoreTargetHit {
-  color: #174d2c;
-  background: #eafff0;
-  border-color: #7ac691;
-}
-
-.challengeCard,
-.partyEventCard {
-  padding: 7px 10px;
-  background: linear-gradient(180deg, #fff9df, #ffe7a6);
-  border: 2px solid #d2a55d;
-  border-radius: 16px;
-  box-shadow: inset 0 -5px 0 rgba(196, 143, 47, 0.1);
-}
-
-.partyEventCard {
-  background: linear-gradient(180deg, #eaf7ff, #cdeaff);
-  border-color: #8abbe8;
-  box-shadow: inset 0 -5px 0 rgba(80, 141, 191, 0.1);
-}
-
-.challengeCard div,
-.partyEventCard div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.challengeCard span,
-.partyEventCard span {
-  color: #8b5d24;
-  font-size: 10px;
-  font-weight: 1000;
-  line-height: 1;
-  letter-spacing: 0;
-}
-
-.partyEventCard span {
-  color: #245d87;
-}
-
-.challengeCard strong,
-.partyEventCard strong {
-  min-width: 0;
-  color: #1b1b1b;
-  font-size: 16px;
-  line-height: 1;
-  font-weight: 1000;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.challengeCard p,
-.partyEventCard p {
-  margin: 4px 0 0;
-  color: #5f4218;
-  font-size: 11px;
-  line-height: 1.15;
-  font-weight: 900;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.partyEventCard p {
-  color: #245d87;
 }
 
 .miniProgressRail {
@@ -348,29 +219,15 @@
   transition: width 220ms ease;
 }
 
-.controlStrip {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1.15fr;
-  gap: 5px;
-}
-
-.controlStrip span {
-  min-height: 29px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #173963;
-  background: #e8f5ff;
-  border: 2px solid #9cc3e8;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 1000;
-  line-height: 1;
-  white-space: nowrap;
+.controlsSticker {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
 }
 
 .miniPlayersSection {
-  padding: 9px;
+  padding: 10px;
   background: rgba(255,255,255,.9);
   border: 2px solid #d9b57a;
   border-radius: 18px;
@@ -385,19 +242,18 @@
 
 .miniPlayersGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 6px;
-  margin-top: 7px;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .miniPlayerCard {
-  min-width: 0;
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 5px;
+  grid-template-columns: 42px 1fr;
+  gap: 8px;
   align-items: center;
-  min-height: 52px;
-  padding: 6px;
+  min-height: 62px;
+  padding: 8px;
   background: linear-gradient(180deg, #ffffff, #fef6de);
   border: 2px solid rgba(175, 123, 47, 0.55);
   border-radius: 14px;
@@ -415,46 +271,35 @@
   filter: grayscale(.45);
 }
 
-.miniPlayerRobot {
-  width: 34px;
-  height: 34px;
+.miniPlayerMarker {
+  width: 42px;
+  height: 42px;
   object-fit: contain;
 }
 
 .miniPlayerText {
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-}
-
-.miniPlayerHead {
-  min-width: 0;
-  align-items: flex-start;
-  justify-content: flex-start;
-  flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .miniPlayerName {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 1000;
   line-height: 1;
-  white-space: nowrap;
 }
 
 .miniPlayerState {
   color: #8b5d24;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 1000;
-  letter-spacing: 0;
-  white-space: nowrap;
+  letter-spacing: .08em;
 }
 
 .heartRow {
   display: flex;
-  gap: 2px;
-  font-size: 15px;
+  gap: 3px;
+  font-size: 17px;
   line-height: 1;
 }
 
@@ -473,19 +318,16 @@
 
 .gameHudButton {
   width: 100%;
-  height: 54px;
+  height: 58px;
   animation: hudButtonPulse 2.4s ease-in-out infinite;
   border: none;
   border-radius: 18px;
   color: #ffffff;
   font-family: inherit;
-  font-size: 23px;
+  font-size: 24px;
   font-weight: 1000;
   letter-spacing: .08em;
-  cursor: default;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  cursor: pointer;
   transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
 }
 
@@ -499,7 +341,53 @@
   box-shadow: 0 6px 0 rgba(27, 88, 49, 0.7);
 }
 
+.gameHudButton:hover {
+  filter: brightness(1.05);
+}
+
+.gameHudButton:active {
+  transform: translateY(3px);
+}
+
 @keyframes hudButtonPulse {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-1px); }
+}
+
+.turnHeroCombo {
+  color: #ffffff;
+  background: linear-gradient(180deg, #4bc57f, #22864d);
+}
+
+.laneMiniBadge span {
+  color: #8b5d24;
+  font-size: 10px;
+  font-weight: 1000;
+  letter-spacing: .08em;
+}
+
+.laneMiniBadgeBonus {
+  background: #fff2a6;
+  border-color: #e0a524;
+}
+
+.laneMiniBadgeFever {
+  background: #ffe0da;
+  border-color: #ef5947;
+}
+
+.laneMiniBadgeDrop {
+  background: #fff2b9;
+  border-color: #f0a51f;
+  box-shadow: 0 0 0 3px rgba(240, 165, 31, 0.16);
+}
+
+.gameHudLockedButton {
+  background: linear-gradient(180deg, #9aa3ad, #65707a);
+  box-shadow: 0 6px 0 rgba(64, 72, 80, 0.62);
+  cursor: wait;
+}
+
+.gameHudButton:disabled {
+  filter: grayscale(0.15);
 }

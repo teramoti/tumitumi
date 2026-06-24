@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './GameScreen.css'
 const gameBgm = '/assets/game_bgm.wav'
+import { playClickSound } from '../../audio/playClickSound'
 import { destroyGame, startGame } from '../../../game/GameManager'
 import { DIFFICULTY_LABELS, getMaxTurns, PLAYER_START_HP, type Difficulty } from '../../data/gameRules'
 import type { GameSettings, GameResult } from '../../App'
@@ -17,10 +18,6 @@ type GameHudState = {
   alive: boolean[]
   successes: number[]
   misses: number[]
-  streaks?: number[]
-  boostAvailable?: boolean[]
-  boostArmed?: boolean
-  boostMultiplier?: number
   turnNumber: number
   maxTurns: number
   round: number
@@ -34,64 +31,35 @@ type GameHudState = {
   ruleName?: string
   selectedItemLabel?: string
   selectedItemDescription?: string
-  selectedItemPoints?: number
-  selectedItemIcon?: string
-  selectedItemColor?: number
   selectedItemKey?: string
-  selectedPlacementPercent?: number
-  selectedLaneLabel?: string
-  targetPlacementPercent?: number
-  targetBonus?: number
-  isTargetMatched?: boolean
+  selectedLaneIndex?: number
   aliveCount?: number
   difficultyLabel?: string
-  challengeLabel?: string
-  challengeHint?: string
-  challengeBonus?: number
-  partyEventLabel?: string
-  partyEventHint?: string
-  roundDropLabel?: string
-  roundItemScale?: number
-  projectedTurnPoints?: number
-  projectedBonusPoints?: number
-  timingRuleLabel?: string
-  feverLabel?: string
-  feverReady?: boolean
-  streak?: number
-  stackHeight?: number
-  choiceCount?: number
+  isActionLocked?: boolean
 }
 
-const ROBOT_IMAGE_PATHS = [
-  '/assets/char_robot_p1.png',
-  '/assets/char_robot_p2.png',
-  '/assets/char_robot_p3.png',
-  '/assets/char_robot_p4.png'
+const PLAYER_MARKER_IMAGE_PATHS = [
+  '/assets/player_badge_p1.png',
+  '/assets/player_badge_p2.png',
+  '/assets/player_badge_p3.png',
+  '/assets/player_badge_p4.png'
 ]
 
 const ITEM_IMAGE_PATHS: Record<string, string> = {
+  kumiNormal: '/assets/kumi_block_normal.png',
+  kumiWide: '/assets/kumi_block_wide.png',
+  kumiLight: '/assets/kumi_block_light.png',
+  kumiRisky: '/assets/kumi_block_risky.png',
+  kumiGuard: '/assets/kumi_block_guard.png',
   book: '/assets/item_book.png',
-  notebook: '/assets/item_notebook.png',
   eraser: '/assets/item_eraser.png',
-  box: '/assets/item_box.png',
-  pencilCase: '/assets/item_pencilCase.png',
-  smallCan: '/assets/item_smallCan.png',
-  tape: '/assets/item_tape.png',
-  ruler: '/assets/item_ruler.png',
+  can: '/assets/item_smallCan.png',
   mug: '/assets/item_mug.png',
+  tape: '/assets/item_tape.png',
   battery: '/assets/item_battery.png',
-  marker: '/assets/item_marker.png',
-  glue: '/assets/item_glue.png',
-  stapler: '/assets/item_stapler.png',
-  scissors: '/assets/item_scissors.png',
-  phone: '/assets/item_phone.png',
-  dice: '/assets/item_dice.png',
-  clip: '/assets/item_clip.png',
-  key: '/assets/item_key.png',
-  watch: '/assets/item_watch.png',
-  card: '/assets/item_card.png',
-  headphones: '/assets/item_headphones.png',
-  earphoneJack: '/assets/item_earphoneJack.png'
+  ruler: '/assets/item_ruler.png',
+  box: '/assets/item_box.png',
+  drop: '/assets/item_smallCan.png'
 }
 
 function Hearts({ hp, alive }: { hp: number, alive: boolean }) {
@@ -113,49 +81,24 @@ export default function GameScreen({ settings, onFinish }: Props) {
     alive: Array(settings.playerCount).fill(true),
     successes: Array(settings.playerCount).fill(0),
     misses: Array(settings.playerCount).fill(0),
-    streaks: Array(settings.playerCount).fill(0),
-    boostAvailable: Array(settings.playerCount).fill(true),
-    boostArmed: false,
-    boostMultiplier: 2.5,
     turnNumber: 0,
-    maxTurns: getMaxTurns(difficultyForInit, settings.playerCount),
+    maxTurns: getMaxTurns(difficultyForInit),
     round: 1,
     scores: Array(settings.playerCount).fill(null),
     currentScore: 0,
     combo: 0,
-    timeLeft: getMaxTurns(difficultyForInit, settings.playerCount),
+    timeLeft: getMaxTurns(difficultyForInit),
     isAnswerChecked: false,
     nextButtonLabel: '次の人へ',
-    actionButtonLabel: '置く！',
-    ruleName: 'デスクつみタワーEX',
-    selectedItemLabel: '雑貨',
-    selectedItemDescription: '置くものを選んでね',
-    selectedItemPoints: 0,
-    selectedItemIcon: 'ITEM',
-    selectedItemColor: 0x4b72d9,
-    selectedItemKey: 'book',
-    selectedPlacementPercent: 50,
-    selectedLaneLabel: '中央',
-    targetPlacementPercent: 50,
-    targetBonus: 60,
-    isTargetMatched: true,
+    actionButtonLabel: '落とす！',
+    ruleName: '逆ジェンガバトル',
+    selectedItemLabel: '落下 1個',
+    selectedItemDescription: 'DROP x1',
+    selectedItemKey: 'can',
+    selectedLaneIndex: 3,
     aliveCount: settings.playerCount,
     difficultyLabel: DIFFICULTY_LABELS[difficultyForInit],
-    challengeLabel: '安全第一',
-    challengeHint: '崩さず置く',
-    challengeBonus: 40,
-    partyEventLabel: '通常ラウンド',
-    partyEventHint: 'お題を狙う',
-    roundDropLabel: '',
-    roundItemScale: 1,
-    projectedTurnPoints: 0,
-    projectedBonusPoints: 0,
-    timingRuleLabel: 'PERF +70',
-    feverLabel: 'FVR +100',
-    feverReady: false,
-    streak: 0,
-    stackHeight: 0,
-    choiceCount: 3
+    isActionLocked: false
   })
 
   const ref = useRef<HTMLDivElement | null>(null)
@@ -175,9 +118,11 @@ export default function GameScreen({ settings, onFinish }: Props) {
     }
 
     playBgm()
+    window.addEventListener('pointerdown', playBgm, { once: true })
     window.addEventListener('keydown', playBgm, { once: true })
 
     const stopBgm = () => {
+      window.removeEventListener('pointerdown', playBgm)
       window.removeEventListener('keydown', playBgm)
       audio.pause()
       audio.currentTime = 0
@@ -212,9 +157,15 @@ export default function GameScreen({ settings, onFinish }: Props) {
     }
   }, [])
 
+  const sendGameCommand = (type: 'answer' | 'next') => {
+    playClickSound()
+    hudTargetRef.current.dispatchEvent(new CustomEvent('game-command', {
+      detail: { type }
+    }))
+  }
+
   const progressRatio = Math.max(0, Math.min(1, hud.turnNumber / Math.max(1, hud.maxTurns)))
-  const selectedItemImage = ITEM_IMAGE_PATHS[hud.selectedItemKey ?? '']
-  const selectedItemColor = `#${(hud.selectedItemColor ?? 0x4b72d9).toString(16).padStart(6, '0')}`
+  const selectedItemImage = ITEM_IMAGE_PATHS[hud.selectedItemKey ?? 'book'] ?? ITEM_IMAGE_PATHS.book
 
   return (
     <div className="gameScreenShell">
@@ -226,81 +177,45 @@ export default function GameScreen({ settings, onFinish }: Props) {
           <div className="hudCornerTape hudCornerTapeRight" aria-hidden="true" />
 
           <div className="miniHudTopRow">
-            <span className="miniHudBadge">{hud.ruleName || 'デスクつみタワーEX'}</span>
+            <span className="miniHudBadge">{hud.ruleName || '逆ジェンガバトル'}</span>
             <span className="miniHudDifficulty">{hud.difficultyLabel}</span>
           </div>
 
           <section className="turnHeroCard">
             <img
-              className="turnHeroRobot"
-              src={ROBOT_IMAGE_PATHS[hud.currentPlayerIndex]}
+              className="turnHeroMarker"
+              src={PLAYER_MARKER_IMAGE_PATHS[hud.currentPlayerIndex]}
               alt={`Player ${hud.currentPlayerIndex + 1}`}
             />
             <div className="turnHeroInfo">
               <div className="turnHeroRow">
                 <span className="turnHeroChip">ROUND {hud.round}</span>
                 <span className="turnHeroChip">TURN {hud.turnNumber}/{hud.maxTurns}</span>
+                <span className="turnHeroChip turnHeroCombo">C{hud.combo}</span>
               </div>
               <p className="turnHeroPlayer">P{hud.currentPlayerIndex + 1} TURN</p>
-              <p className="turnHeroText">{hud.isAnswerChecked ? 'つぎへ' : 'えらんで おく'}</p>
+              <p className="turnHeroText">{hud.isAnswerChecked ? 'つぎへ' : '落とす場所をねらう'}</p>
             </div>
           </section>
 
           <div className="miniStatusRow">
             <div className="selectedItemMiniCard">
-              {selectedItemImage ? (
-                <img className="selectedItemMiniImage" src={selectedItemImage} alt={hud.selectedItemLabel ?? '雑貨'} />
-              ) : (
-                <span className="selectedItemFallback" style={{ backgroundColor: selectedItemColor }}>
-                  {hud.selectedItemIcon ?? 'ITEM'}
-                </span>
-              )}
+              <img className="selectedItemMiniImage" src={selectedItemImage} alt={hud.selectedItemLabel ?? '落下物'} />
               <div className="selectedItemMiniText">
-                <strong>{hud.selectedItemLabel ?? '雑貨'}</strong>
-                <span>基礎点 +{hud.selectedItemPoints ?? 0}</span>
+                <strong>{hud.selectedItemLabel ?? '落下物'}</strong>
               </div>
             </div>
-            <div className="laneMiniBadge">
-              <span>位置</span>
-              <strong>{hud.selectedLaneLabel ?? '中央'}</strong>
-              <em>{hud.selectedPlacementPercent ?? 50}%</em>
+            <div className={`laneMiniBadge ${hud.selectedItemDescription === 'BONUS' ? 'laneMiniBadgeBonus' : ''} ${hud.selectedItemDescription === 'FEVER' ? 'laneMiniBadgeFever' : ''} ${hud.selectedItemDescription?.startsWith('DROP') ? 'laneMiniBadgeDrop' : ''}`}>
+              <span>{hud.selectedItemDescription === 'BONUS' ? 'BONUS' : hud.selectedItemDescription === 'FEVER' ? 'FEVER' : hud.selectedItemDescription?.startsWith('DROP') ? 'DROP' : 'L'}</span>
+              <strong>{hud.selectedLaneIndex ?? 3}</strong>
             </div>
           </div>
-
-          <div className="scoreStrip" aria-label="スコア">
-            <span className={hud.isTargetMatched ? 'scoreTargetHit' : ''}>TGT {hud.targetPlacementPercent ?? 50}%</span>
-            <span>NEXT +{hud.projectedTurnPoints ?? hud.selectedItemPoints ?? 0}</span>
-            <span>HIGH {hud.stackHeight ?? 0}px</span>
-            <span>TOTAL {hud.currentScore}</span>
-          </div>
-
-          <section className="partyEventCard" aria-label="ラウンドイベント">
-            <div>
-              <span>EVENT</span>
-              <strong>{hud.partyEventLabel ?? '通常ラウンド'}</strong>
-            </div>
-            <p>{hud.partyEventHint ?? ''}</p>
-            <p>CHOICE {hud.choiceCount ?? 3} / SIZE x{(hud.roundItemScale ?? 1).toFixed(1)} / {hud.boostArmed ? 'BST x2.5' : hud.boostAvailable?.[hud.currentPlayerIndex] ? 'B x2.5' : 'B USED'} / S{hud.streak ?? 0}</p>
-          </section>
-
-          <section className="challengeCard" aria-label="お題">
-            <div>
-              <span>CHALLENGE</span>
-              <strong>{hud.challengeLabel ?? '安全第一'}</strong>
-            </div>
-            <p>{hud.challengeHint ?? '崩さず置く'} +{hud.challengeBonus ?? 40}</p>
-          </section>
 
           <div className="miniProgressRail" aria-hidden="true">
             <span style={{ width: `${progressRatio * 100}%` }} />
           </div>
 
-          <div className="controlStrip" aria-label="操作説明">
-            <span>←→ 場所</span>
-            <span>↑↓ 雑貨</span>
-            <span>B BOOST</span>
-            <span>PERFECTで安定</span>
-          </div>
+          <img className="controlsSticker" src="/assets/ui_controls_hint.png" alt="操作説明" />
 
           <section className="miniPlayersSection" aria-label="プレイヤーHP">
             <div className="miniPlayersHeader">
@@ -313,7 +228,7 @@ export default function GameScreen({ settings, onFinish }: Props) {
                 const alive = hud.alive[index] ?? true
                 return (
                   <div className={`miniPlayerCard ${isCurrent ? 'miniPlayerCardCurrent' : ''} ${alive ? '' : 'miniPlayerCardDead'}`} key={index}>
-                    <img className="miniPlayerRobot" src={ROBOT_IMAGE_PATHS[index]} alt="" />
+                    <img className="miniPlayerMarker" src={PLAYER_MARKER_IMAGE_PATHS[index]} alt="" />
                     <div className="miniPlayerText">
                       <div className="miniPlayerHead">
                         <span className="miniPlayerName">P{index + 1}</span>
@@ -327,12 +242,14 @@ export default function GameScreen({ settings, onFinish }: Props) {
             </div>
           </section>
 
-          <div
-            className={`gameHudButton ${hud.isAnswerChecked ? 'gameHudNextButton' : 'gameHudAnswerButton'}`}
-            aria-label={hud.isAnswerChecked ? 'SPACEまたはENTERで次へ' : 'SPACEまたはENTERで置く'}
+          <button
+            className={`gameHudButton ${hud.isActionLocked ? 'gameHudLockedButton' : hud.isAnswerChecked ? 'gameHudNextButton' : 'gameHudAnswerButton'}`}
+            type="button"
+            disabled={hud.isActionLocked}
+            onClick={() => sendGameCommand(hud.isAnswerChecked ? 'next' : 'answer')}
           >
-            {hud.isAnswerChecked ? 'SPACE / ENTER' : 'SPACE 置く'}
-          </div>
+            {hud.isAnswerChecked ? hud.nextButtonLabel : (hud.actionButtonLabel || '落とす！')}
+          </button>
         </aside>
       </div>
     </div>
