@@ -7,18 +7,19 @@ body {
 }
 
 body {
-  background: #101010;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background:
+    radial-gradient(circle at 12% 14%, rgba(255,255,255,.5) 0 24px, transparent 25px),
+    linear-gradient(180deg, #78ddff 0%, #b6f3bd 54%, #f7b85b 100%);
   overflow: hidden;
 }
 
 #root {
-  width: 1280px;
-  height: 720px;
+  width: 100vw;
+  height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
   overflow: hidden;
-  background: #ffffff;
+  background: transparent;
 }
 
 * {

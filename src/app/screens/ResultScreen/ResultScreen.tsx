@@ -57,11 +57,9 @@ export default function ResultScreen({ result, onBack }: Props) {
     }
 
     playBgm()
-    window.addEventListener('pointerdown', playBgm, { once: true })
     window.addEventListener('keydown', playBgm, { once: true })
 
     return () => {
-      window.removeEventListener('pointerdown', playBgm)
       window.removeEventListener('keydown', playBgm)
       audio.pause()
       audio.currentTime = 0
@@ -140,7 +138,7 @@ export default function ResultScreen({ result, onBack }: Props) {
                 <img className="animalRankBadge" src={PLAYER_MARKER_IMAGE_PATHS[entry.player - 1]} alt="" />
                 <div className="animalRankPlayer">P{entry.player}</div>
                 <div className="animalRankScore">{entry.score}</div>
-                <div className="animalRankMini">SAFE {entry.successes ?? 0} / MISS {entry.misses ?? 0}</div>
+                <div className="animalRankMini">OK {entry.successes ?? 0} / MISS {entry.misses ?? 0}</div>
               </article>
             )
           })}

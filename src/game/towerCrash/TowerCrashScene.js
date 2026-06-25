@@ -23,7 +23,7 @@ const WORLD = {
     height: 720,
     stageCenterX: 650,
     matTopY: 606,
-    matWidth: 560,
+    matWidth: 460,
     matHeight: 44,
     floorY: 688,
     faultLineY: 655,
@@ -34,29 +34,35 @@ const PLAYER_COLORS = [0xe94834, 0x2f73c9, 0x2da65d, 0xf0a51f]
 const PLAYER_DARK_COLORS = [0xa22d24, 0x1e4f91, 0x1f7143, 0x9b6413]
 
 const DIFFICULTY_CONFIG = {
-    easy: { gravity: 0.92, settleMs: 520, label: 'ゆるめ', maxDrop: 3 },
-    normal: { gravity: 1.02, settleMs: 560, label: 'ふつう', maxDrop: 4 },
-    hard: { gravity: 1.12, settleMs: 620, label: 'ぐらぐら', maxDrop: 5 },
+    easy: { gravity: 0.92, settleMs: 360, label: 'ゆるめ', maxDrop: 3 },
+    normal: { gravity: 1.02, settleMs: 390, label: 'ふつう', maxDrop: 4 },
+    hard: { gravity: 1.12, settleMs: 430, label: 'ぐらぐら', maxDrop: 5 },
 }
 
 const ANIMAL_TYPES = [
-    { key: 'cat', label: 'ねこ', imageKey: 'animal-cat', width: 118, height: 72, density: 0.0042, points: 110 },
-    { key: 'dog', label: 'いぬ', imageKey: 'animal-dog', width: 122, height: 72, density: 0.0044, points: 120 },
-    { key: 'panda', label: 'パンダ', imageKey: 'animal-panda', width: 124, height: 76, density: 0.0046, points: 130 },
-    { key: 'turtle', label: 'カメ', imageKey: 'animal-turtle', width: 128, height: 66, density: 0.0052, points: 145 },
-    { key: 'penguin', label: 'ペンギン', imageKey: 'animal-penguin', width: 78, height: 104, density: 0.0036, points: 165 },
-    { key: 'seal', label: 'アザラシ', imageKey: 'animal-seal', width: 126, height: 66, density: 0.004, points: 175 },
-    { key: 'elephant', label: 'ぞう', imageKey: 'animal-elephant', width: 156, height: 82, density: 0.0056, points: 210 },
-    { key: 'giraffe', label: 'キリン', imageKey: 'animal-giraffe', width: 92, height: 132, density: 0.0038, points: 240 },
+    { key: 'cat', label: 'ねこ', imageKey: 'animal-cat', width: 138, height: 68, density: 0.0042, points: 120, shape: 'capsule', risk: 2 },
+    { key: 'dog', label: 'いぬ', imageKey: 'animal-dog', width: 150, height: 70, density: 0.0044, points: 125, shape: 'capsule', risk: 2 },
+    { key: 'panda', label: 'パンダ', imageKey: 'animal-panda', width: 112, height: 112, density: 0.0046, points: 190, shape: 'circle', risk: 4 },
+    { key: 'turtle', label: 'カメ', imageKey: 'animal-turtle', width: 152, height: 58, density: 0.0052, points: 125, shape: 'longBox', risk: 1 },
+    { key: 'penguin', label: 'ペンギン', imageKey: 'animal-penguin', width: 70, height: 124, density: 0.0036, points: 215, shape: 'tallBox', risk: 4 },
+    { key: 'seal', label: 'アザラシ', imageKey: 'animal-seal', width: 168, height: 60, density: 0.004, points: 145, shape: 'longBox', risk: 2 },
+    { key: 'elephant', label: 'ぞう', imageKey: 'animal-elephant', width: 190, height: 92, density: 0.0056, points: 170, shape: 'heavyBox', risk: 2 },
+    { key: 'giraffe', label: 'キリン', imageKey: 'animal-giraffe', width: 78, height: 166, density: 0.0038, points: 270, shape: 'tallBox', risk: 5 },
+    { key: 'lion', label: 'ライオン', imageKey: 'animal-lion', width: 148, height: 82, density: 0.0048, points: 160, shape: 'capsule', risk: 2 },
+    { key: 'bear', label: 'くま', imageKey: 'animal-bear', width: 130, height: 110, density: 0.0051, points: 175, shape: 'square', risk: 3 },
+    { key: 'rabbit', label: 'うさぎ', imageKey: 'animal-rabbit', width: 76, height: 148, density: 0.0033, points: 245, shape: 'tallBox', risk: 5 },
+    { key: 'fox', label: 'きつね', imageKey: 'animal-fox', width: 158, height: 72, density: 0.0041, points: 185, shape: 'wedge', risk: 3 },
+    { key: 'hippo', label: 'カバ', imageKey: 'animal-hippo', width: 150, height: 108, density: 0.0058, points: 180, shape: 'square', risk: 3 },
+    { key: 'crocodile', label: 'ワニ', imageKey: 'animal-crocodile', width: 220, height: 54, density: 0.0054, points: 150, shape: 'longBox', risk: 1 },
+    { key: 'monkey', label: 'サル', imageKey: 'animal-monkey', width: 116, height: 116, density: 0.004, points: 200, shape: 'circle', risk: 4 },
+    { key: 'hedgehog', label: 'ハリネズミ', imageKey: 'animal-hedgehog', width: 146, height: 74, density: 0.0046, points: 205, shape: 'wedge', risk: 3 },
 ]
 
 const DROP_PLANS = [
-    { key: 'safe', label: 'SAFE', countBonus: -1, forceBonus: -0.16, spreadBonus: -18, scoreMultiplier: 0.78, risk: 1, color: 0x2da65d },
-    { key: 'basic', label: 'BASIC', countBonus: 0, forceBonus: 0, spreadBonus: 0, scoreMultiplier: 1, risk: 2, color: 0xf0a51f },
-    { key: 'attack', label: 'ATTACK', countBonus: 1, forceBonus: 0.42, spreadBonus: 36, scoreMultiplier: 1.48, risk: 3, color: 0xe94834 },
+    { key: 'animal', label: 'ANIMAL', countBonus: 0, forceBonus: 0, spreadBonus: 0, scoreMultiplier: 1, risk: 1, color: 0xf0a51f },
 ]
 
-const TURN_SELECT_MS = 4800
+const TURN_SELECT_MS = 3600
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
 
@@ -84,7 +90,10 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.laneViews = []
         this.loadCards = []
         this.selectedLaneIndex = 2
-        this.selectedPlanIndex = 1
+        this.selectedDropX = WORLD.stageCenterX
+        this.selectedRotation = 0
+        this.rotationPreview = null
+        this.selectedPlanIndex = 0
         this.bonusLaneIndex = 2
         this.dropProfile = null
         this.pendingScore = 0
@@ -121,6 +130,14 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.load.image('animal-elephant', '/assets/animal_elephant.png')
         this.load.image('animal-giraffe', '/assets/animal_giraffe.png')
         this.load.image('animal-seal', '/assets/animal_seal.png')
+        this.load.image('animal-lion', '/assets/animal_lion.png')
+        this.load.image('animal-bear', '/assets/animal_bear.png')
+        this.load.image('animal-rabbit', '/assets/animal_rabbit.png')
+        this.load.image('animal-fox', '/assets/animal_fox.png')
+        this.load.image('animal-hippo', '/assets/animal_hippo.png')
+        this.load.image('animal-crocodile', '/assets/animal_crocodile.png')
+        this.load.image('animal-monkey', '/assets/animal_monkey.png')
+        this.load.image('animal-hedgehog', '/assets/animal_hedgehog.png')
         this.load.image('ui-stamp-safe', '/assets/ui_stamp_safe.png')
         this.load.image('ui-stamp-miss', '/assets/ui_stamp_miss.png')
         this.load.image('ui-turn-plate', '/assets/ui_turn_plate.png')
@@ -167,6 +184,7 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.createHudTexts()
         this.registerExternalCommands()
         this.registerKeyboard()
+        this.registerPointerControls()
         this.sfx = {
             place: this.sound.add('se-place', { volume: 0.58 }),
             safe: this.sound.add('se-safe', { volume: 0.62 }),
@@ -195,7 +213,37 @@ export default class TowerCrashScene extends Phaser.Scene {
     }
 
     registerKeyboard() {
-        this.keyHandlers = this.input.keyboard?.addKeys('LEFT,RIGHT,UP,DOWN,A,D,W,S,SPACE,ENTER')
+        this.keyHandlers = this.input.keyboard?.addKeys('LEFT,RIGHT,A,D,Q,E,SPACE,ENTER')
+    }
+
+    registerPointerControls() {
+        this.input.on('pointermove', (pointer) => {
+            if (this.phase !== 'select') return
+            this.selectedDropX = clamp(pointer.worldX, this.getPlacementMinX(), this.getPlacementMaxX())
+            this.dropProfile = this.getDropProfile()
+            this.updateTargetCursor()
+            this.dispatchHud(false)
+        })
+
+        this.input.on('pointerdown', (pointer) => {
+            if (this.phase !== 'select') return
+            if (pointer.button !== 0) return
+            this.selectedDropX = clamp(pointer.worldX, this.getPlacementMinX(), this.getPlacementMaxX())
+            this.dropSelectedLoad()
+        })
+
+        this.input.on('wheel', (_pointer, _gameObjects, _deltaX, deltaY) => {
+            if (this.phase !== 'select') return
+            this.rotateSelectedAnimal(deltaY > 0 ? 1 : -1)
+        })
+    }
+
+    rotateSelectedAnimal(direction) {
+        const step = Phaser.Math.DegToRad(11.25)
+        this.selectedRotation = Phaser.Math.Angle.Wrap((this.selectedRotation ?? 0) + direction * step)
+        this.playSfx('select')
+        this.updateTargetCursor()
+        this.dispatchHud(false)
     }
 
     playSfx(key) {
@@ -222,32 +270,11 @@ export default class TowerCrashScene extends Phaser.Scene {
             bg.fillCircle(x - 14, y + 8, 12)
         }
 
-        bg.fillStyle(0xfff9e8, 0.94)
-        bg.fillRoundedRect(408, 18, 485, 132, 24)
-        bg.lineStyle(5, 0x8f5d28, 1)
-        bg.strokeRoundedRect(408, 18, 485, 132, 24)
-        bg.fillStyle(0xffdf89, 1)
-        bg.fillRoundedRect(432, 32, 130, 34, 14)
-        bg.lineStyle(3, 0xb57a2e, 1)
-        bg.strokeRoundedRect(432, 32, 130, 34, 14)
-        this.add.text(497, 49, 'TURN', {
-            fontFamily: FONT,
-            fontSize: '18px', color: '#8b5d24', fontStyle: 'bold', stroke: '#ffffff', strokeThickness: 4,
-        }).setOrigin(0.5)
-
-        bg.fillStyle(0xfffbef, 0.94)
-        bg.fillRoundedRect(980, 96, 270, 330, 26)
-        bg.lineStyle(5, 0x8f5d28, 1)
-        bg.strokeRoundedRect(980, 96, 270, 330, 26)
-        bg.fillStyle(0xffdf89, 1)
-        bg.fillRoundedRect(1022, 114, 186, 34, 16)
-        bg.lineStyle(3, 0xb57a2e, 1)
-        bg.strokeRoundedRect(1022, 114, 186, 34, 16)
-        this.add.text(1115, 131, 'W/S  作戦', {
-            fontFamily: FONT,
-            fontSize: '18px', color: '#8b5d24', fontStyle: 'bold', stroke: '#ffffff', strokeThickness: 4,
-        }).setOrigin(0.5)
-        this.add.image(1115, 404, 'ui-controls-hint').setDisplaySize(220, 46).setAlpha(0.95)
+        // 画面上の白い説明パネルを削り、ゲーム画面内の最小HUDに寄せる。
+        bg.fillStyle(0xffffff, 0.18)
+        bg.fillRoundedRect(458, 20, 384, 64, 26)
+        bg.lineStyle(3, 0xffffff, 0.5)
+        bg.strokeRoundedRect(458, 20, 384, 64, 26)
 
         bg.fillStyle(0xffe28a, 1)
         bg.fillRect(0, 618, WORLD.width, 102)
@@ -257,15 +284,19 @@ export default class TowerCrashScene extends Phaser.Scene {
         bg.beginPath(); bg.moveTo(0, 618); bg.lineTo(WORLD.width, 618); bg.strokePath()
 
         const matX = WORLD.stageCenterX - WORLD.matWidth / 2
-        bg.fillStyle(0x5cb5ff, 1)
-        bg.fillRoundedRect(matX, WORLD.matTopY, WORLD.matWidth, WORLD.matHeight, 18)
-        bg.fillStyle(0xeef7ff, 1)
-        bg.fillRoundedRect(matX + 24, WORLD.matTopY + 9, WORLD.matWidth - 48, 10, 8)
-        bg.lineStyle(6, 0x1f4f91, 1)
-        bg.strokeRoundedRect(matX, WORLD.matTopY, WORLD.matWidth, WORLD.matHeight, 18)
+        bg.fillStyle(0x1fb653, 1)
+        bg.fillRoundedRect(matX, WORLD.matTopY, WORLD.matWidth, WORLD.matHeight, 10)
+        bg.fillStyle(0x31d86b, 1)
+        bg.fillRoundedRect(matX + 10, WORLD.matTopY + 6, WORLD.matWidth - 20, 11, 7)
+        bg.fillStyle(0x11873a, 1)
+        for (let x = matX + 12; x < matX + WORLD.matWidth - 12; x += 28) {
+            bg.fillTriangle(x, WORLD.matTopY + WORLD.matHeight - 2, x + 14, WORLD.matTopY + WORLD.matHeight + 28, x + 28, WORLD.matTopY + WORLD.matHeight - 2)
+        }
+        bg.lineStyle(6, 0x0c7d32, 1)
+        bg.strokeRoundedRect(matX, WORLD.matTopY, WORLD.matWidth, WORLD.matHeight, 10)
         this.add.text(WORLD.stageCenterX, WORLD.matTopY + 23, '台から落ちたらミス', {
             fontFamily: FONT,
-            fontSize: '18px', color: '#17365e', fontStyle: 'bold', stroke: '#ffffff', strokeThickness: 4,
+            fontSize: '18px', color: '#ffffff', fontStyle: 'bold', stroke: '#0b692c', strokeThickness: 4,
         }).setOrigin(0.5)
     }
 
@@ -283,25 +314,25 @@ export default class TowerCrashScene extends Phaser.Scene {
     }
 
     createHudTexts() {
-        this.messageText = this.add.text(650, 76, '', {
-            fontFamily: FONT, fontSize: '38px', color: '#1b1b1b', fontStyle: 'bold',
-            stroke: '#ffffff', strokeThickness: 8, align: 'center', wordWrap: { width: 420, useAdvancedWrap: true },
+        this.messageText = this.add.text(650, 47, '', {
+            fontFamily: FONT, fontSize: '28px', color: '#1b1b1b', fontStyle: 'bold',
+            stroke: '#ffffff', strokeThickness: 7, align: 'center', wordWrap: { width: 360, useAdvancedWrap: true },
         }).setOrigin(0.5).setDepth(55)
-        this.hintText = this.add.text(650, 116, '', {
-            fontFamily: FONT, fontSize: '22px', color: '#6b3a08', fontStyle: 'bold',
-            stroke: '#ffffff', strokeThickness: 5, align: 'center', wordWrap: { width: 420, useAdvancedWrap: true },
+        this.hintText = this.add.text(650, 78, '', {
+            fontFamily: FONT, fontSize: '17px', color: '#6b3a08', fontStyle: 'bold',
+            stroke: '#ffffff', strokeThickness: 4, align: 'center', wordWrap: { width: 360, useAdvancedWrap: true },
         }).setOrigin(0.5).setDepth(55)
-        this.turnText = this.add.text(650, 143, '', {
-            fontFamily: FONT, fontSize: '20px', color: '#1b1b1b', fontStyle: 'bold',
-            stroke: '#ffffff', strokeThickness: 5, align: 'center', wordWrap: { width: 420, useAdvancedWrap: true },
+        this.turnText = this.add.text(650, 102, '', {
+            fontFamily: FONT, fontSize: '16px', color: '#1b1b1b', fontStyle: 'bold',
+            stroke: '#ffffff', strokeThickness: 4, align: 'center', wordWrap: { width: 360, useAdvancedWrap: true },
         }).setOrigin(0.5).setDepth(55)
-        this.targetText = this.add.text(1115, 354, '', {
-            fontFamily: FONT, fontSize: '21px', color: '#1b1b1b', fontStyle: 'bold',
-            stroke: '#ffffff', strokeThickness: 5, align: 'center', wordWrap: { width: 220, useAdvancedWrap: true },
+        this.targetText = this.add.text(1028, 96, '', {
+            fontFamily: FONT, fontSize: '17px', color: '#1b1b1b', fontStyle: 'bold',
+            stroke: '#ffffff', strokeThickness: 4, align: 'center', wordWrap: { width: 180, useAdvancedWrap: true },
         }).setOrigin(0.5).setDepth(55)
-        this.timerText = this.add.text(1220, 354, '', {
-            fontFamily: FONT, fontSize: '28px', color: '#e94834', fontStyle: 'bold',
-            stroke: '#ffffff', strokeThickness: 6, align: 'center',
+        this.timerText = this.add.text(1118, 96, '', {
+            fontFamily: FONT, fontSize: '24px', color: '#e94834', fontStyle: 'bold',
+            stroke: '#ffffff', strokeThickness: 5, align: 'center',
         }).setOrigin(0.5).setDepth(55)
     }
 
@@ -329,6 +360,8 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.animals = []
         this.cursorView?.destroy()
         this.cursorView = null
+        this.rotationPreview?.destroy()
+        this.rotationPreview = null
         this.destroyLaneViews()
         this.destroyLoadCards()
         this.stableSince = null
@@ -336,22 +369,72 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.towerPressure = 0
     }
 
-    createAnimalBody(type, x, y, force = 2.7, owner = null, storm = false) {
-        const body = MATTER.Bodies.rectangle(x, y, type.width, type.height, {
-            friction: 0.86,
-            frictionStatic: 0.64,
-            restitution: 0.04,
+    createAnimalMatterBody(type, x, y) {
+        const baseOptions = {
+            friction: type.shape === 'circle' ? 0.62 : 0.88,
+            frictionStatic: type.shape === 'circle' ? 0.38 : 0.68,
+            restitution: type.shape === 'circle' ? 0.08 : 0.035,
             density: type.density,
             frictionAir: 0.0015,
-            chamfer: { radius: 8 },
+        }
+
+        if (type.shape === 'circle') {
+            return MATTER.Bodies.circle(x, y, Math.max(type.width, type.height) * 0.46, baseOptions, 28)
+        }
+
+        if (type.shape === 'square') {
+            return MATTER.Bodies.rectangle(x, y, type.width, type.height, {
+                ...baseOptions,
+                chamfer: { radius: 4 },
+            })
+        }
+
+        if (type.shape === 'longBox') {
+            return MATTER.Bodies.rectangle(x, y, type.width, type.height, {
+                ...baseOptions,
+                chamfer: { radius: 5 },
+            })
+        }
+
+        if (type.shape === 'tallBox') {
+            return MATTER.Bodies.rectangle(x, y, type.width, type.height, {
+                ...baseOptions,
+                chamfer: { radius: 6 },
+            })
+        }
+
+        if (type.shape === 'heavyBox') {
+            return MATTER.Bodies.rectangle(x, y, type.width, type.height, {
+                ...baseOptions,
+                chamfer: { radius: 7 },
+            })
+        }
+
+        if (type.shape === 'wedge') {
+            return MATTER.Bodies.trapezoid(x, y, type.width, type.height, 0.34, {
+                ...baseOptions,
+                chamfer: { radius: 5 },
+            })
+        }
+
+        return MATTER.Bodies.rectangle(x, y, type.width, type.height, {
+            ...baseOptions,
+            chamfer: { radius: Math.min(16, Math.max(6, type.height * 0.24)) },
         })
+    }
+
+    createAnimalBody(type, x, y, force = 2.7, owner = null, storm = false, angle = null) {
+        const body = this.createAnimalMatterBody(type, x, y)
         this.matter.world.add(body)
-        MATTER.Body.setVelocity(body, { x: Phaser.Math.FloatBetween(-0.35, 0.35), y: force })
-        MATTER.Body.setAngularVelocity(body, Phaser.Math.FloatBetween(-0.045, 0.045))
+        const initialAngle = angle ?? Phaser.Math.FloatBetween(-0.55, 0.55)
+        MATTER.Body.setAngle(body, initialAngle)
+        MATTER.Body.setVelocity(body, { x: Phaser.Math.FloatBetween(-0.28, 0.28), y: force })
+        const angularBase = type.shape === 'circle' ? 0.08 : type.shape === 'tallBox' ? 0.06 : type.shape === 'wedge' ? 0.055 : 0.035
+        MATTER.Body.setAngularVelocity(body, angle === null ? Phaser.Math.FloatBetween(-angularBase, angularBase) : Phaser.Math.FloatBetween(-angularBase * 0.35, angularBase * 0.35))
         const view = this.add.container(x, y).setDepth(26)
         const shadow = this.add.graphics()
         shadow.fillStyle(0x000000, 0.12)
-        shadow.fillEllipse(0, type.height / 2 + 7, type.width * 0.72, 8)
+        shadow.fillEllipse(0, type.height / 2 + 7, Math.max(42, type.width * 0.72), 8)
         const image = this.add.image(0, 0, type.imageKey).setDisplaySize(type.width, type.height)
         view.add([shadow, image])
         const animal = { body, view, type, active: true, owner, storm }
@@ -372,22 +455,27 @@ export default class TowerCrashScene extends Phaser.Scene {
         return clamp(minY, 128, WORLD.matTopY - 58)
     }
 
+    getPlacementMinX() {
+        return WORLD.stageCenterX - WORLD.matWidth / 2 + 46
+    }
+
+    getPlacementMaxX() {
+        return WORLD.stageCenterX + WORLD.matWidth / 2 - 46
+    }
+
     getSelectedLaneX() {
-        return WORLD.stageCenterX + DROP_LANE_OFFSETS[this.selectedLaneIndex]
+        return clamp(this.selectedDropX ?? WORLD.stageCenterX, this.getPlacementMinX(), this.getPlacementMaxX())
     }
 
     createLaneViews() {
         this.destroyLaneViews()
-        DROP_LANE_OFFSETS.forEach((offset, index) => {
-            const x = WORLD.stageCenterX + offset
-            const lane = this.add.container(x, WORLD.matTopY - 24).setDepth(42)
-            const g = this.add.graphics()
-            const hint = this.add.text(0, 18, index === this.selectedLaneIndex ? 'TARGET' : '', {
-                fontFamily: FONT, fontSize: '13px', color: '#ffffff', fontStyle: 'bold', stroke: '#7b4a18', strokeThickness: 3,
-            }).setOrigin(0.5)
-            lane.add([g, hint])
-            this.laneViews.push({ lane, g, hint, index })
-        })
+        const zone = this.add.container(WORLD.stageCenterX, WORLD.matTopY - 24).setDepth(42)
+        const g = this.add.graphics()
+        const label = this.add.text(0, 24, '← → どこでも動かせる', {
+            fontFamily: FONT, fontSize: '13px', color: '#ffffff', fontStyle: 'bold', stroke: '#7b4a18', strokeThickness: 3,
+        }).setOrigin(0.5)
+        zone.add([g, label])
+        this.laneViews.push({ lane: zone, g, label, index: 0 })
         this.updateLaneViews()
     }
 
@@ -397,46 +485,28 @@ export default class TowerCrashScene extends Phaser.Scene {
     }
 
     updateLaneViews() {
-        this.laneViews.forEach(({ g, hint, index }) => {
-            const selected = index === this.selectedLaneIndex
-            const bonus = index === this.bonusLaneIndex
-            const color = bonus ? 0xffcf3d : (PLAYER_COLORS[this.currentPlayerIndex] ?? 0xffffff)
+        this.laneViews.forEach(({ g, label }) => {
+            const width = WORLD.matWidth - 34
             g.clear()
-            g.fillStyle(selected ? color : 0xffffff, selected ? 0.2 : 0.06)
-            g.fillRoundedRect(-42, -232, 84, 246, 17)
-            g.lineStyle(selected ? 6 : 2, selected ? color : 0xffffff, selected ? 1 : 0.26)
-            g.strokeRoundedRect(-42, -232, 84, 246, 17)
-            if (selected) {
-                g.fillStyle(color, 0.95)
-                g.fillTriangle(-18, -210, 18, -210, 0, -180)
-                g.fillRoundedRect(-24, -176, 48, 118, 22)
-                g.fillTriangle(-18, -58, 18, -58, 0, -26)
-            }
-            if (bonus) {
-                g.fillStyle(0xffcf3d, selected ? 0.9 : 0.55)
-                g.fillRoundedRect(-30, -224, 60, 24, 12)
-            }
-            hint.setText(selected ? 'TARGET' : '')
+            g.fillStyle(0xffffff, 0.08)
+            g.fillRoundedRect(-width / 2, -232, width, 246, 24)
+            g.lineStyle(3, 0xffffff, 0.34)
+            g.strokeRoundedRect(-width / 2, -232, width, 246, 24)
+            g.fillStyle(0xffcf3d, 0.42)
+            g.fillRoundedRect(-width / 2, 2, width, 34, 16)
+            label.setText('← → どこでも動かせる')
         })
     }
 
     createLoadCards() {
         this.destroyLoadCards()
-        DROP_PLANS.forEach((plan, index) => {
-            const y = 186 + index * 58
-            const profile = this.getDropProfileForPlan(index)
-            const card = this.add.container(1110, y).setDepth(52)
-            const bg = this.add.graphics()
-            const icon = this.add.image(-72, 0, profile.types[0].imageKey).setDisplaySize(44, 34)
-            const label = this.add.text(-22, -10, plan.label, {
-                fontFamily: FONT, fontSize: '19px', color: '#1b1b1b', fontStyle: 'bold', stroke: '#ffffff', strokeThickness: 4,
-            }).setOrigin(0, 0.5)
-            const value = this.add.text(-22, 14, `x${profile.count}`, {
-                fontFamily: FONT, fontSize: '16px', color: '#6b3a08', fontStyle: 'bold', stroke: '#ffffff', strokeThickness: 3,
-            }).setOrigin(0, 0.5)
-            card.add([bg, icon, label, value])
-            this.loadCards.push({ card, bg, index, plan })
-        })
+        const profile = this.getDropProfile()
+        const type = profile.types[0]
+        const card = this.add.container(965, 96).setDepth(52)
+        const bg = this.add.graphics()
+        const icon = this.add.image(0, 0, type.imageKey).setDisplaySize(type.width * 0.42, type.height * 0.42)
+        card.add([bg, icon])
+        this.loadCards.push({ card, bg, icon, index: 0, plan: DROP_PLANS[0] })
         this.updateLoadCards()
     }
 
@@ -445,47 +515,67 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.loadCards = []
     }
 
-    selectPlan(index) {
+    selectPlan() {
         if (this.phase !== 'select') return
-        this.selectedPlanIndex = clamp(index, 0, DROP_PLANS.length - 1)
+        this.selectedPlanIndex = 0
         this.dropProfile = this.getDropProfile()
-        this.playSfx('select')
         this.updateLoadCards()
         this.updateTargetCursor()
         this.dispatchHud(false)
     }
 
     updateLoadCards() {
-        this.loadCards.forEach(({ bg, index, plan, card }) => {
-            const selected = index === this.selectedPlanIndex
-            bg.clear()
-            bg.fillStyle(selected ? plan.color : 0xfffbef, selected ? 0.95 : 0.82)
-            bg.fillRoundedRect(-96, -23, 192, 46, 16)
-            bg.lineStyle(selected ? 5 : 3, selected ? 0xffffff : 0x8f5d28, 0.95)
-            bg.strokeRoundedRect(-96, -23, 192, 46, 16)
-            card.setScale(selected ? 1.05 : 1)
-        })
         const profile = this.dropProfile ?? this.getDropProfile()
-        this.targetText?.setText(`${profile.label} / ${profile.count} DROP`)
+        const type = profile.types[0]
+        this.loadCards.forEach(({ bg, card, icon }) => {
+            bg.clear()
+            bg.fillStyle(0xffffff, 0.52)
+            bg.fillCircle(0, 0, 42)
+            bg.lineStyle(3, 0xffffff, 0.62)
+            bg.strokeCircle(0, 0, 42)
+            icon?.setTexture(type.imageKey).setDisplaySize(type.width * 0.42, type.height * 0.42).setRotation(this.selectedRotation ?? 0)
+            card.setScale(1)
+        })
+        const degrees = Math.round(Phaser.Math.RadToDeg(this.selectedRotation ?? 0))
+        this.targetText?.setText(`NEXT ${profile.label}  ${degrees}°`)
     }
+
 
     updateTargetCursor() {
         if (!this.cursorView) this.cursorView = this.add.graphics().setDepth(44)
         this.cursorView.clear()
         const laneX = this.getSelectedLaneX()
         const topY = this.getTowerTopY()
-        const color = this.selectedLaneIndex === this.bonusLaneIndex ? 0xffcf3d : (PLAYER_COLORS[this.currentPlayerIndex] ?? 0xffffff)
-        this.cursorView.lineStyle(6, color, 0.95)
-        this.cursorView.strokeRoundedRect(laneX - 42, topY - 236, 84, 244, 18)
-        this.cursorView.fillStyle(color, 0.12)
-        this.cursorView.fillRoundedRect(laneX - 42, topY - 236, 84, 244, 18)
-        this.cursorView.lineStyle(5, color, 0.95)
+        const color = PLAYER_COLORS[this.currentPlayerIndex] ?? 0xffffff
+        const profile = this.dropProfile ?? this.getDropProfile()
+        const type = profile.types[0]
+        const previewY = Math.max(54, topY - 214)
+        this.cursorView.lineStyle(7, color, 0.96)
         this.cursorView.beginPath()
-        this.cursorView.moveTo(laneX, topY - 226)
-        this.cursorView.lineTo(laneX, topY - 38)
+        this.cursorView.moveTo(laneX, Math.max(42, topY - 250))
+        this.cursorView.lineTo(laneX, topY - 36)
         this.cursorView.strokePath()
         this.cursorView.fillStyle(color, 0.95)
-        this.cursorView.fillTriangle(laneX - 15, topY - 54, laneX + 15, topY - 54, laneX, topY - 28)
+        this.cursorView.fillTriangle(laneX - 20, topY - 68, laneX + 20, topY - 68, laneX, topY - 34)
+        this.cursorView.fillStyle(color, 0.14)
+        this.cursorView.fillRoundedRect(laneX - 64, topY - 236, 128, 236, 20)
+        this.cursorView.lineStyle(4, color, 0.8)
+        this.cursorView.strokeRoundedRect(laneX - 64, topY - 236, 128, 236, 20)
+        this.cursorView.lineStyle(3, 0xffffff, 0.72)
+        this.cursorView.strokeCircle(laneX, previewY, Math.max(36, Math.max(type.width, type.height) * 0.34))
+        this.cursorView.fillStyle(0xffffff, 0.28)
+        this.cursorView.fillCircle(laneX, previewY, 5)
+
+        if (!this.rotationPreview || this.rotationPreview.texture.key !== type.imageKey) {
+            this.rotationPreview?.destroy()
+            this.rotationPreview = this.add.image(laneX, previewY, type.imageKey).setDepth(45).setAlpha(0.82)
+        }
+        this.rotationPreview
+            .setPosition(laneX, previewY)
+            .setDisplaySize(type.width * 0.82, type.height * 0.82)
+            .setRotation(this.selectedRotation ?? 0)
+            .setAlpha(0.82)
+
         this.updateLaneViews()
         this.updateLoadCards()
     }
@@ -514,8 +604,9 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.phase = 'preTurn'
         this.turnNumber += 1
         this.roundNumber = Math.floor((this.turnNumber - 1) / Math.max(1, this.playerCount)) + 1
-        this.selectedLaneIndex = clamp(this.selectedLaneIndex, 0, DROP_LANE_OFFSETS.length - 1)
-        this.selectedPlanIndex = clamp(this.selectedPlanIndex, 0, DROP_PLANS.length - 1)
+        this.selectedDropX = clamp(WORLD.stageCenterX + Phaser.Math.Between(-120, 120), this.getPlacementMinX(), this.getPlacementMaxX())
+        this.selectedRotation = Phaser.Math.DegToRad(Phaser.Math.Between(-20, 20))
+        this.selectedPlanIndex = 0
         this.bonusLaneIndex = (this.turnNumber + this.currentPlayerIndex * 2) % DROP_LANE_OFFSETS.length
         this.droppedThisTurn = []
         this.dropProfile = this.getDropProfile()
@@ -542,7 +633,7 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.createLaneViews()
         this.createLoadCards()
         this.showTurnSplash(this.currentPlayerIndex)
-        this.showMessage(`P${this.currentPlayerIndex + 1} の番`, `${this.dropProfile.label} / ${this.dropProfile.count}個`)
+        this.showMessage(`P${this.currentPlayerIndex + 1} の番`, `${this.dropProfile.label} / 形がちがう`)
         this.updateTargetCursor()
         this.dispatchHud(false)
     }
@@ -555,9 +646,10 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.destroyLaneViews()
         this.destroyLoadCards()
         this.cursorView?.clear()
+        this.rotationPreview?.setAlpha(0)
         const count = Math.min(this.difficultyConfig.maxDrop + 2, 1 + this.roundNumber)
         this.showMessage('一巡おわり！', `上から追加 ${count}匹`)
-        this.time.delayedCall(240, () => this.spawnRoundAnimals(count, 2.7 + this.roundNumber * 0.16))
+        this.time.delayedCall(120, () => this.spawnRoundAnimals(count, 2.7 + this.roundNumber * 0.16))
         this.dispatchHud(false)
     }
 
@@ -569,7 +661,8 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.destroyLaneViews()
         this.destroyLoadCards()
         this.cursorView?.clear()
-        this.showMessage('ATTACK DROP', `追加 ${this.attackStormCount}個`)
+        this.rotationPreview?.setAlpha(0)
+        this.showMessage('追加どうぶつ', `上から ${this.attackStormCount}匹`)
         this.time.delayedCall(220, () => this.spawnStormAnimals(this.attackStormCount, 2.95 + this.roundNumber * 0.16, true))
         this.dispatchHud(false)
     }
@@ -577,20 +670,21 @@ export default class TowerCrashScene extends Phaser.Scene {
 
     spawnRoundAnimals(count, force) {
         for (let index = 0; index < count; index += 1) {
-            const laneIndex = (this.roundNumber + index * 2) % DROP_LANE_OFFSETS.length
             const type = ANIMAL_TYPES[(this.roundNumber * 3 + index * 2) % ANIMAL_TYPES.length]
-            const x = WORLD.stageCenterX + DROP_LANE_OFFSETS[laneIndex] + Phaser.Math.Between(-18, 18)
+            const minX = this.getPlacementMinX()
+            const maxX = this.getPlacementMaxX()
+            const ratio = count === 1 ? 0.5 : index / Math.max(1, count - 1)
+            const x = minX + (maxX - minX) * ratio + Phaser.Math.Between(-22, 22)
             const y = Math.max(54, this.getTowerTopY() - 350 - index * 38)
-            this.time.delayedCall(index * 180, () => this.createAnimalBody(type, x, y, force, null, true))
+            this.time.delayedCall(index * 95, () => this.createAnimalBody(type, x, y, force, null, true))
         }
-        this.time.delayedCall(Math.max(360, count * 180), () => this.nudgeTower(0.0008 + this.roundNumber * 0.00022))
+        this.time.delayedCall(Math.max(220, count * 95), () => this.nudgeTower(0.0008 + this.roundNumber * 0.00022))
     }
 
     spawnStormAnimals(count, force, storm = true) {
         for (let index = 0; index < count; index += 1) {
-            const laneIndex = (this.selectedLaneIndex + index + 1) % DROP_LANE_OFFSETS.length
             const type = ANIMAL_TYPES[(this.turnNumber + this.roundNumber + index * 2) % ANIMAL_TYPES.length]
-            const x = WORLD.stageCenterX + DROP_LANE_OFFSETS[laneIndex] + Phaser.Math.Between(-24, 24)
+            const x = clamp(this.getSelectedLaneX() + Phaser.Math.Between(-120, 120), this.getPlacementMinX(), this.getPlacementMaxX())
             const y = Math.max(56, this.getTowerTopY() - 330 - index * 32)
             this.time.delayedCall(index * 150, () => this.createAnimalBody(type, x, y, force, null, storm))
         }
@@ -600,6 +694,7 @@ export default class TowerCrashScene extends Phaser.Scene {
         if (this.phase !== 'select') return
         this.phase = 'settling'
         this.cursorView?.clear()
+        this.rotationPreview?.setAlpha(0)
         this.destroyLaneViews()
         this.destroyLoadCards()
         this.timerText?.setText('')
@@ -607,18 +702,16 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.stableSince = null
         this.droppedThisTurn = []
         const profile = this.dropProfile ?? this.getDropProfile()
-        const isBonus = this.selectedLaneIndex === this.bonusLaneIndex
         const comboRate = 1 + Math.min(this.combo[this.currentPlayerIndex] ?? 0, 5) * 0.14
-        this.pendingBonus = isBonus
-        this.pendingScore = Math.round((profile.score + (isBonus ? 240 : 0)) * comboRate)
+        this.pendingBonus = false
+        this.pendingScore = Math.round(profile.score * comboRate)
         const baseX = this.getSelectedLaneX()
         const baseY = Math.max(72, this.getTowerTopY() - 300)
         this.playSfx('place')
-        if (isBonus) this.playSfx('bonus')
-        this.showMessage('つむ！', `${profile.count}個 / ${profile.label}`)
+        this.showMessage('つむ！', profile.label)
         profile.types.forEach((type, index) => {
             this.time.delayedCall(150 * index, () => {
-                this.createAnimalBody(type, baseX + profile.offsets[index], baseY - index * 34, profile.force, this.currentPlayerIndex, false)
+                this.createAnimalBody(type, baseX + profile.offsets[index], baseY - index * 34, profile.force, this.currentPlayerIndex, false, this.selectedRotation ?? 0)
             })
         })
         this.time.delayedCall(420, () => this.nudgeTower(0.0009 + profile.risk * 0.00042 + this.towerPressure * 0.0002))
@@ -629,36 +722,22 @@ export default class TowerCrashScene extends Phaser.Scene {
         return this.getDropProfileForPlan(this.selectedPlanIndex)
     }
 
-    getDropProfileForPlan(planIndex) {
-        const plan = DROP_PLANS[planIndex] ?? DROP_PLANS[1]
+    getDropProfileForPlan() {
         const round = Math.max(1, this.roundNumber)
-        const baseCount = Math.min(this.difficultyConfig.maxDrop, 1 + Math.floor((round - 1) / 1))
-        const count = clamp(baseCount + plan.countBonus, 1, 6)
-        const poolSize = Math.min(ANIMAL_TYPES.length, 3 + round * 2)
-        const pool = ANIMAL_TYPES.slice(0, poolSize)
-        const types = []
-        for (let index = 0; index < count; index += 1) {
-            const pickIndex = (this.turnNumber + this.currentPlayerIndex + this.selectedLaneIndex + planIndex * 2 + index * 3) % pool.length
-            types.push(pool[pickIndex])
-        }
-        const spread = Math.max(10, Math.min(165, 30 + round * 15 + plan.spreadBonus))
-        const offsets = types.map((_, index) => {
-            if (types.length === 1) return 0
-            const ratio = index / Math.max(1, types.length - 1)
-            return -spread / 2 + ratio * spread + Phaser.Math.Between(-10, 10)
-        })
-        const basePoints = types.reduce((sum, type) => sum + (type.points ?? 100), 0)
+        const pool = ANIMAL_TYPES
+        const pickIndex = (this.turnNumber * 3 + this.currentPlayerIndex * 5 + Math.floor((this.getSelectedLaneX() - this.getPlacementMinX()) / 44) + round) % pool.length
+        const type = pool[pickIndex]
         return {
-            plan,
-            label: plan.label,
-            key: plan.key,
-            hudKey: types[0]?.key ?? 'cat',
-            count,
-            types,
-            offsets,
-            force: 2.48 + Math.min(round, 5) * 0.2 + plan.forceBonus,
-            risk: plan.risk,
-            score: Math.round(basePoints * plan.scoreMultiplier),
+            plan: DROP_PLANS[0],
+            label: type.label,
+            key: 'animal',
+            hudKey: type.key,
+            count: 1,
+            types: [type],
+            offsets: [0],
+            force: 2.32 + Math.min(round, 5) * 0.11,
+            risk: type.risk ?? Math.max(1, Math.round((type.points ?? 100) / 120)),
+            score: type.points ?? 100,
         }
     }
 
@@ -697,62 +776,69 @@ export default class TowerCrashScene extends Phaser.Scene {
             return
         }
         if (this.phase !== 'select') return
-        if (Phaser.Input.Keyboard.JustDown(keys.LEFT) || Phaser.Input.Keyboard.JustDown(keys.A)) {
-            this.selectedLaneIndex = (this.selectedLaneIndex - 1 + DROP_LANE_OFFSETS.length) % DROP_LANE_OFFSETS.length
-            this.playSfx('select')
+        const move = 5.8
+        let moved = false
+        if (keys.LEFT?.isDown || keys.A?.isDown) {
+            this.selectedDropX = clamp((this.selectedDropX ?? WORLD.stageCenterX) - move, this.getPlacementMinX(), this.getPlacementMaxX())
+            moved = true
+        }
+        if (keys.RIGHT?.isDown || keys.D?.isDown) {
+            this.selectedDropX = clamp((this.selectedDropX ?? WORLD.stageCenterX) + move, this.getPlacementMinX(), this.getPlacementMaxX())
+            moved = true
+        }
+        if (Phaser.Input.Keyboard.JustDown(keys.Q)) this.rotateSelectedAnimal(-1)
+        if (Phaser.Input.Keyboard.JustDown(keys.E)) this.rotateSelectedAnimal(1)
+        if (moved) {
+            this.dropProfile = this.getDropProfile()
             this.updateTargetCursor()
             this.dispatchHud(false)
         }
-        if (Phaser.Input.Keyboard.JustDown(keys.RIGHT) || Phaser.Input.Keyboard.JustDown(keys.D)) {
-            this.selectedLaneIndex = (this.selectedLaneIndex + 1) % DROP_LANE_OFFSETS.length
-            this.playSfx('select')
-            this.updateTargetCursor()
-            this.dispatchHud(false)
-        }
-        if (Phaser.Input.Keyboard.JustDown(keys.UP) || Phaser.Input.Keyboard.JustDown(keys.W)) this.selectPlan((this.selectedPlanIndex - 1 + DROP_PLANS.length) % DROP_PLANS.length)
-        if (Phaser.Input.Keyboard.JustDown(keys.DOWN) || Phaser.Input.Keyboard.JustDown(keys.S)) this.selectPlan((this.selectedPlanIndex + 1) % DROP_PLANS.length)
         if (Phaser.Input.Keyboard.JustDown(keys.SPACE) || Phaser.Input.Keyboard.JustDown(keys.ENTER)) this.dropSelectedLoad()
     }
 
     checkPlayerDropSettle() {
-        if (this.time.now - this.dropStartedAt < 720) return
+        if (this.time.now - this.dropStartedAt < 420) return
         const fallen = this.getFallenAnimal()
         if (fallen) {
             this.handleMiss(fallen)
             return
         }
-        const minWait = 760 + Math.max(0, (this.dropProfile?.count ?? 1) - 1) * 120
+        const minWait = 460
         if (this.time.now - this.dropStartedAt < minWait) return
         if (this.isTowerStable()) {
             if (this.stableSince === null) this.stableSince = this.time.now
             if (this.time.now - this.stableSince >= this.difficultyConfig.settleMs) this.handleSafe()
         } else {
             this.stableSince = null
-            if (this.time.now - this.dropStartedAt > 3000) this.handleSafe()
+            if (this.time.now - this.dropStartedAt > 1800) this.handleSafe()
         }
     }
 
     checkStormSettle(kind) {
         const startedAt = kind === 'round' ? this.roundStormStartedAt : this.attackStormStartedAt
-        if (this.time.now - startedAt < 900) return
+        if (this.time.now - startedAt < 520) return
         const fallen = this.getFallenAnimal()
         if (fallen) {
-            if (kind === 'attack') this.handleMiss(fallen)
-            else {
-                this.removeFallenAnimals()
-                this.time.delayedCall(280, () => this.beginTurn())
+            this.removeFallenAnimals()
+            if (kind === 'round') {
+                this.roundStormStableSince = null
+                this.roundStormStartedAt = this.time.now
+            } else {
+                this.attackStormStableSince = null
+                this.attackStormStartedAt = this.time.now
             }
+            this.showMessage('追加どうぶつ', '落ちた分はノーカウント')
             return
         }
         if (this.isTowerStable()) {
             if (kind === 'round') {
                 if (this.roundStormStableSince === null) this.roundStormStableSince = this.time.now
-                if (this.time.now - this.roundStormStableSince > 520) this.beginTurn()
+                if (this.time.now - this.roundStormStableSince > 320) this.beginTurn()
             } else {
                 if (this.attackStormStableSince === null) this.attackStormStableSince = this.time.now
-                if (this.time.now - this.attackStormStableSince > 520) this.enterSelectPhase()
+                if (this.time.now - this.attackStormStableSince > 320) this.enterSelectPhase()
             }
-        } else if (this.time.now - startedAt > 3300) {
+        } else if (this.time.now - startedAt > 1900) {
             if (kind === 'round') this.beginTurn()
             else this.enterSelectPhase()
         }
@@ -800,12 +886,11 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.successes[player] += 1
         this.dropPoints[player] += this.pendingScore
         this.towerPressure = Math.min(10, this.towerPressure + Math.max(1, this.dropProfile?.risk ?? 1))
-        const attackAmount = this.queueAttack(player)
         this.playSfx('safe')
         if (this.pendingBonus) this.playSfx('bonus')
         this.showStamp(WORLD.stageCenterX, 250, 'safe')
         this.showScorePopup(WORLD.stageCenterX, 328, `+${this.pendingScore}`)
-        this.showMessage('セーフ！', attackAmount > 0 ? `NEXT +${attackAmount}` : `+${this.pendingScore} / C${this.combo[player]}`)
+        this.showMessage('セーフ！', `SPACEで次の人へ  +${this.pendingScore}`)
         this.pendingScore = 0
         this.pendingBonus = false
         this.dispatchHud(true)
@@ -831,13 +916,13 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.pendingBonus = false
         this.towerPressure = Math.max(0, this.towerPressure - 2)
         if (this.hp[player] <= 0) this.alive[player] = false
-        this.cameras.main.shake(360, 0.01)
+        this.cameras.main.shake(220, 0.008)
         this.playSfx('miss')
         const x = fallenAnimal?.body?.position?.x ?? WORLD.stageCenterX
         const y = Math.min(fallenAnimal?.body?.position?.y ?? 610, 610)
         this.showStamp(x, y, 'miss')
         this.showSparkBurst(x, y, 0xe94834)
-        this.showMessage('ミス！', this.hp[player] > 0 ? `P${player + 1} HP -1` : `P${player + 1} OUT`)
+        this.showMessage('ミス！', this.hp[player] > 0 ? `SPACEで交代  P${player + 1} HP -1` : `SPACEで交代  P${player + 1} OUT`)
         this.removeFallenAnimals()
         this.dispatchHud(true)
         this.updatePlayerViews()
@@ -984,9 +1069,10 @@ export default class TowerCrashScene extends Phaser.Scene {
                 actionButtonLabel: this.phase === 'select' ? 'つむ！' : '判定中',
                 ruleName: 'どうぶつタワーバトル',
                 selectedItemLabel: `${profile.label} x${profile.count}`,
-                selectedItemDescription: this.phase === 'roundDrop' ? 'ROUND DROP' : this.phase === 'attackDrop' ? `ATTACK ${this.attackStormCount}` : (this.selectedLaneIndex === this.bonusLaneIndex ? 'BONUS' : `DROP ${profile.count}`),
+                selectedItemDescription: this.phase === 'roundDrop' ? 'EXTRA DROP' : 'DROP',
                 selectedItemKey: profile.hudKey,
                 selectedLaneIndex: undefined,
+                selectedRotationDegrees: Math.round(Phaser.Math.RadToDeg(this.selectedRotation ?? 0)),
                 aliveCount: this.alive.filter(Boolean).length,
                 difficultyLabel: this.difficultyConfig.label,
             },
@@ -1006,6 +1092,7 @@ export default class TowerCrashScene extends Phaser.Scene {
         this.destroyLaneViews()
         this.destroyLoadCards()
         this.cursorView?.clear()
+        this.rotationPreview?.setAlpha(0)
         this.timerText?.setText('')
         const results = Array.from({ length: this.playerCount }, (_, index) => ({
             player: index + 1,
@@ -1021,6 +1108,6 @@ export default class TowerCrashScene extends Phaser.Scene {
         }))
         this.showMessage('FINISH!', '結果へ')
         this.dispatchHud(true)
-        this.time.delayedCall(700, () => runtimeOnFinish({ results }))
+        this.time.delayedCall(450, () => runtimeOnFinish({ results }))
     }
 }

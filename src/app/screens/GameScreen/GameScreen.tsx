@@ -32,6 +32,7 @@ type GameHudState = {
   selectedItemDescription?: string
   selectedItemKey?: string
   selectedLaneIndex?: number
+  selectedRotationDegrees?: number
   aliveCount?: number
   difficultyLabel?: string
   isActionLocked?: boolean
@@ -53,6 +54,14 @@ const ITEM_IMAGE_PATHS: Record<string, string> = {
   elephant: '/assets/animal_elephant.png',
   giraffe: '/assets/animal_giraffe.png',
   seal: '/assets/animal_seal.png',
+  lion: '/assets/animal_lion.png',
+  bear: '/assets/animal_bear.png',
+  rabbit: '/assets/animal_rabbit.png',
+  fox: '/assets/animal_fox.png',
+  hippo: '/assets/animal_hippo.png',
+  crocodile: '/assets/animal_crocodile.png',
+  monkey: '/assets/animal_monkey.png',
+  hedgehog: '/assets/animal_hedgehog.png',
   drop: '/assets/animal_cat.png'
 }
 
@@ -90,6 +99,7 @@ export default function GameScreen({ settings, onFinish }: Props) {
     selectedItemDescription: 'DROP x1',
     selectedItemKey: 'cat',
     selectedLaneIndex: 3,
+    selectedRotationDegrees: 0,
     aliveCount: settings.playerCount,
     difficultyLabel: DIFFICULTY_LABELS[difficultyForInit],
     isActionLocked: false
@@ -112,11 +122,9 @@ export default function GameScreen({ settings, onFinish }: Props) {
     }
 
     playBgm()
-    window.addEventListener('pointerdown', playBgm, { once: true })
     window.addEventListener('keydown', playBgm, { once: true })
 
     const stopBgm = () => {
-      window.removeEventListener('pointerdown', playBgm)
       window.removeEventListener('keydown', playBgm)
       audio.pause()
       audio.currentTime = 0
@@ -152,7 +160,6 @@ export default function GameScreen({ settings, onFinish }: Props) {
   }, [])
 
 
-  const progressRatio = Math.max(0, Math.min(1, hud.turnNumber / Math.max(1, hud.maxTurns)))
   const selectedItemImage = ITEM_IMAGE_PATHS[hud.selectedItemKey ?? 'cat'] ?? ITEM_IMAGE_PATHS.cat
 
   return (
@@ -160,79 +167,32 @@ export default function GameScreen({ settings, onFinish }: Props) {
       <div className="gameScreenPanel">
         <div className="gameCanvasHost" ref={ref} />
 
-        <aside className="gameMiniHud" aria-label="ゲーム情報">
-          <div className="hudCornerTape hudCornerTapeLeft" aria-hidden="true" />
-          <div className="hudCornerTape hudCornerTapeRight" aria-hidden="true" />
-
-          <div className="miniHudTopRow">
-            <span className="miniHudBadge">{hud.ruleName || 'どうぶつタワーバトル'}</span>
-            <span className="miniHudDifficulty">{hud.difficultyLabel}</span>
+        <aside className="consoleHud" aria-label="ゲーム情報">
+          <div className="consoleTurn">
+            <img src={PLAYER_MARKER_IMAGE_PATHS[hud.currentPlayerIndex]} alt="" />
+            <strong>P{hud.currentPlayerIndex + 1}</strong>
+            <span>TURN {hud.turnNumber}/{hud.maxTurns}</span>
+            <em>{hud.timeLeft}</em>
           </div>
 
-          <section className="turnHeroCard">
-            <img
-              className="turnHeroMarker"
-              src={PLAYER_MARKER_IMAGE_PATHS[hud.currentPlayerIndex]}
-              alt={`Player ${hud.currentPlayerIndex + 1}`}
-            />
-            <div className="turnHeroInfo">
-              <div className="turnHeroRow">
-                <span className="turnHeroChip">ROUND {hud.round}</span>
-                <span className="turnHeroChip">TURN {hud.turnNumber}/{hud.maxTurns}</span>
-                <span className="turnHeroChip turnHeroCombo">C{hud.combo}</span>
-              </div>
-              <p className="turnHeroPlayer">P{hud.currentPlayerIndex + 1} TURN</p>
-              <p className="turnHeroText">{hud.isAnswerChecked ? 'つぎへ' : '場所をねらう'}</p>
-            </div>
-          </section>
-
-          <div className="miniStatusRow">
-            <div className="selectedItemMiniCard">
-              <img className="selectedItemMiniImage" src={selectedItemImage} alt={hud.selectedItemLabel ?? 'どうぶつ'} />
-              <div className="selectedItemMiniText">
-                <strong>{hud.selectedItemLabel ?? 'どうぶつ'}</strong>
-              </div>
-            </div>
-            <div className={`laneMiniBadge ${hud.selectedItemDescription === 'BONUS' ? 'laneMiniBadgeBonus' : ''} ${hud.selectedItemDescription === 'FEVER' ? 'laneMiniBadgeFever' : ''} ${hud.selectedItemDescription?.startsWith('DROP') || hud.selectedItemDescription === 'ROUND DROP' ? 'laneMiniBadgeDrop' : ''} ${hud.selectedItemDescription?.startsWith('ATTACK') ? 'laneMiniBadgeAttack' : ''}`}>
-              <span>{hud.selectedItemDescription === 'BONUS' ? 'BONUS' : hud.selectedItemDescription === 'FEVER' ? 'FEVER' : hud.selectedItemDescription === 'ROUND DROP' ? 'ROUND' : hud.selectedItemDescription?.startsWith('ATTACK') ? 'ATK' : hud.selectedItemDescription?.startsWith('DROP') ? 'DROP' : 'TARGET'}</span>
-              <strong>{hud.selectedItemDescription?.startsWith('ATTACK') ? hud.selectedItemDescription.replace('ATTACK ', '') : '← →'}</strong>
-            </div>
+          <div className="consoleNextAnimal">
+            <img src={selectedItemImage} alt="" style={{ transform: `rotate(${hud.selectedRotationDegrees ?? 0}deg)` }} />
+            <span>MOUSE / ←→</span>
+            <strong>WHEEL / Q E / CLICK / SPACE</strong>
           </div>
 
-          <div className="miniProgressRail" aria-hidden="true">
-            <span style={{ width: `${progressRatio * 100}%` }} />
-          </div>
-
-          <img className="controlsSticker" src="/assets/ui_controls_animal.png" alt="操作説明" />
-
-          <section className="miniPlayersSection" aria-label="プレイヤーHP">
-            <div className="miniPlayersHeader">
-              <span>PLAYERS</span>
-              <span>{hud.aliveCount ?? hud.playerCount}/{hud.playerCount} ALIVE</span>
-            </div>
-            <div className="miniPlayersGrid">
-              {Array.from({ length: hud.playerCount }, (_, index) => {
-                const isCurrent = index === hud.currentPlayerIndex
-                const alive = hud.alive[index] ?? true
-                return (
-                  <div className={`miniPlayerCard ${isCurrent ? 'miniPlayerCardCurrent' : ''} ${alive ? '' : 'miniPlayerCardDead'}`} key={index}>
-                    <img className="miniPlayerMarker" src={PLAYER_MARKER_IMAGE_PATHS[index]} alt="" />
-                    <div className="miniPlayerText">
-                      <div className="miniPlayerHead">
-                        <span className="miniPlayerName">P{index + 1}</span>
-                        <span className="miniPlayerState">{alive ? (isCurrent ? 'TURN' : 'OK') : 'OUT'}</span>
-                      </div>
-                      <Hearts hp={hud.hp[index] ?? 0} alive={alive} />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </section>
-
-          <div className={`keyboardOnlyPanel ${hud.isActionLocked ? 'keyboardOnlyLocked' : hud.isAnswerChecked ? 'keyboardOnlyNext' : 'keyboardOnlyReady'}`} aria-label="キーボード操作">
-            <span>{hud.isAnswerChecked ? 'SPACE / ENTER' : '← →  W S'}</span>
-            <strong>{hud.isAnswerChecked ? hud.nextButtonLabel : 'SPACE つむ'}</strong>
+          <div className="consolePlayers">
+            {Array.from({ length: hud.playerCount }, (_, index) => {
+              const isCurrent = index === hud.currentPlayerIndex
+              const alive = hud.alive[index] ?? true
+              return (
+                <div className={`consolePlayer ${isCurrent ? 'consolePlayerCurrent' : ''} ${alive ? '' : 'consolePlayerDead'}`} key={index}>
+                  <img src={PLAYER_MARKER_IMAGE_PATHS[index]} alt="" />
+                  <span>P{index + 1}</span>
+                  <Hearts hp={hud.hp[index] ?? 0} alive={alive} />
+                </div>
+              )
+            })}
           </div>
         </aside>
       </div>

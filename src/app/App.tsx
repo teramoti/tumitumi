@@ -105,6 +105,8 @@ export default function App() {
   const [result, setResult] = useState<GameResult | null>(null)
   const playerCount = getGameManagerPlayerCount()
 
+
+
   const handleStart = (nextSettings: Omit<GameSettings, 'playerCount'>) => {
     setSettings({
       ...nextSettings,

@@ -17,29 +17,49 @@ const difficultyOrder: Difficulty[] = ['easy', 'normal', 'hard']
 
 const howToSlides = [
   { image: '/assets/ui_animal_howto_1.png', alt: '左右でねらう' },
-  { image: '/assets/ui_animal_howto_2.png', alt: '上下で作戦' },
-  { image: '/assets/ui_animal_howto_3.png', alt: 'スペースでつむ' }
+  { image: '/assets/ui_animal_howto_2.png', alt: '落とす場所を決める' },
+  { image: '/assets/ui_animal_howto_3.png', alt: '崩さず積む' }
 ]
 
 function TowerPreview() {
+  const ringAnimals = [
+    '/assets/animal_cat.png',
+    '/assets/animal_panda.png',
+    '/assets/animal_crocodile.png',
+    '/assets/animal_giraffe.png',
+    '/assets/animal_rabbit.png',
+    '/assets/animal_elephant.png'
+  ]
+
   return (
-    <div className="animalTowerPreview" aria-hidden="true">
-      <div className="dropGuide g1" />
-      <div className="dropGuide g2" />
-      <div className="dropGuide g3" />
-      <div className="dropTargetArrow" />
+    <div className="animalTowerPreview steamPreview" aria-hidden="true">
+      <div className="previewSun" />
+      <div className="previewCloud cloudA" />
+      <div className="previewCloud cloudB" />
+      <div className="previewSpotlight" />
+      <div className="shapeBadge shapeCircle">ROUND</div>
+      <div className="shapeBadge shapeBox">BOX</div>
+      <div className="shapeBadge shapeLong">LONG</div>
+      <div className="animalOrbit">
+        {ringAnimals.map((src, index) => (
+          <img className={`orbitAnimal orbitAnimal${index + 1}`} src={src} alt="" key={src} />
+        ))}
+      </div>
       <img className="animalDrop drop1" src="/assets/animal_penguin.png" alt="" />
-      <img className="animalDrop drop2" src="/assets/animal_cat.png" alt="" />
+      <img className="animalDrop drop2" src="/assets/animal_lion.png" alt="" />
+      <img className="animalDrop drop3" src="/assets/animal_crocodile.png" alt="" />
+      <img className="animalDrop drop4" src="/assets/animal_giraffe.png" alt="" />
+      <img className="animalDrop drop5" src="/assets/animal_panda.png" alt="" />
+      <div className="comboRibbon">16 ANIMALS / PHYSICS STACK</div>
       <div className="animalStage" />
-      <div className="previewBadge previewBadgeLeft">KEY ONLY</div>
-      <div className="previewBadge previewBadgeRight">ROUND DROP</div>
+      <div className="stageGlow" />
     </div>
   )
 }
 
 export default function StartScreen({ playerCount, onStart }: Props) {
   const [difficulty, setDifficulty] = useState<Difficulty>('normal')
-  const [selectedMenuIndex, setSelectedMenuIndex] = useState(0)
+  const [selectedMenuIndex, setSelectedMenuIndex] = useState(1)
   const [isHowToOpen, setIsHowToOpen] = useState(false)
   const [howToIndex, setHowToIndex] = useState(0)
 
@@ -115,7 +135,7 @@ export default function StartScreen({ playerCount, onStart }: Props) {
 
       if (key === 'ArrowLeft' || key.toLowerCase() === 'a') {
         event.preventDefault()
-        if (selectedMenuIndex === 1) {
+        if (selectedMenuIndex === 0) {
           playClickSound()
           setDifficulty((value) => {
             const index = difficultyOrder.indexOf(value)
@@ -127,7 +147,7 @@ export default function StartScreen({ playerCount, onStart }: Props) {
 
       if (key === 'ArrowRight' || key.toLowerCase() === 'd') {
         event.preventDefault()
-        if (selectedMenuIndex === 1) {
+        if (selectedMenuIndex === 0) {
           playClickSound()
           setDifficulty((value) => {
             const index = difficultyOrder.indexOf(value)
@@ -140,8 +160,8 @@ export default function StartScreen({ playerCount, onStart }: Props) {
       if (key === ' ' || key === 'Enter') {
         event.preventDefault()
         playClickSound()
-        if (selectedMenuIndex === 0) onStart({ difficulty })
-        if (selectedMenuIndex === 1) {
+        if (selectedMenuIndex === 1) onStart({ difficulty })
+        if (selectedMenuIndex === 0) {
           setDifficulty((value) => {
             const index = difficultyOrder.indexOf(value)
             return difficultyOrder[(index + 1) % difficultyOrder.length]
@@ -170,7 +190,11 @@ export default function StartScreen({ playerCount, onStart }: Props) {
         <section className="animalStartBody animalStartBodyFresh">
           <TowerPreview />
 
-          <aside className="animalStartMenu animalStartMenuFresh">
+          <aside className="animalStartMenu animalStartMenuFresh steamMenu">
+            <div className="steamMenuHeader">
+              <span>PARTY STACK MODE</span>
+              <strong>LOCAL 4P</strong>
+            </div>
             <img className="animalRuleImage animalRuleImageFresh" src="/assets/ui_animal_rule.png" alt="操作説明" />
 
             <div className="animalInfoGrid animalInfoGridFresh">
@@ -178,49 +202,89 @@ export default function StartScreen({ playerCount, onStart }: Props) {
                 <span>PLAYERS</span>
                 <strong>{playerCount}</strong>
               </div>
-              <div className={`animalInfoCard animalInfoCardFresh animalModeButton ${selectedMenuIndex === 1 ? 'menuFocus' : ''}`}>
+              <div
+                className={`animalInfoCard animalInfoCardFresh animalModeButton ${selectedMenuIndex === 0 ? 'menuFocus' : ''}`}
+                onMouseEnter={() => setSelectedMenuIndex(0)}
+                onClick={() => {
+                  playClickSound()
+                  setDifficulty((value) => {
+                    const index = difficultyOrder.indexOf(value)
+                    return difficultyOrder[(index + 1) % difficultyOrder.length]
+                  })
+                }}
+                onWheel={(event) => {
+                  event.preventDefault()
+                  playClickSound()
+                  setDifficulty((value) => {
+                    const index = difficultyOrder.indexOf(value)
+                    return difficultyOrder[(index + (event.deltaY > 0 ? 1 : difficultyOrder.length - 1)) % difficultyOrder.length]
+                  })
+                }}
+              >
                 <span>MODE</span>
                 <strong>{DIFFICULTY_LABELS[difficulty]}</strong>
                 <em>{maxTurns} TURN</em>
               </div>
             </div>
 
-            <div className="menuKeyHint">
-              <span>↑↓ SELECT</span>
-              <span>←→ MODE</span>
-              <span>SPACE OK</span>
+            <div className="menuKeyHint mouseKeyHint">
+              <span>MOUSE / ↑↓</span>
+              <span>CLICK / SPACE</span>
+              <span>WHEEL / Q E</span>
             </div>
 
-            <button
-              className={`animalStartButton ${selectedMenuIndex === 0 ? 'menuFocus' : ''}`}
-              type="button"
-              tabIndex={-1}
-              onClick={() => onStart({ difficulty })}
+            <div
+              className={`animalStartButton animalKeyOnlyButton ${selectedMenuIndex === 1 ? 'menuFocus' : ''}`}
+              onMouseEnter={() => setSelectedMenuIndex(1)}
+              onClick={() => {
+                playClickSound()
+                onStart({ difficulty })
+              }}
             >
               START
-            </button>
+            </div>
 
-            <button
-              className={`animalHowToButton ${selectedMenuIndex === 2 ? 'menuFocus' : ''}`}
-              type="button"
-              tabIndex={-1}
+            <div
+              className={`animalHowToButton animalKeyOnlyButton ${selectedMenuIndex === 2 ? 'menuFocus' : ''}`}
+              onMouseEnter={() => setSelectedMenuIndex(2)}
               onClick={() => {
+                playClickSound()
                 setHowToIndex(0)
                 setIsHowToOpen(true)
               }}
             >
               HOW TO
-            </button>
+            </div>
           </aside>
         </section>
 
         {isHowToOpen && (
           <div className="animalDialogLayer" role="presentation">
-            <div className="animalHowToDialog animalHowToDialogFresh" role="dialog" aria-modal="true" aria-label="遊び方">
+            <div
+              className="animalHowToDialog animalHowToDialogFresh"
+              role="dialog"
+              aria-modal="true"
+              aria-label="遊び方"
+              onClick={() => {
+                playClickSound()
+                setHowToIndex((value) => {
+                  if (value >= howToSlides.length - 1) {
+                    setIsHowToOpen(false)
+                    return 0
+                  }
+                  return value + 1
+                })
+              }}
+              onWheel={(event) => {
+                event.preventDefault()
+                playClickSound()
+                setHowToIndex((value) => Math.max(0, Math.min(howToSlides.length - 1, value + (event.deltaY > 0 ? 1 : -1))))
+              }}
+            >
               <img className="animalHowToImage animalHowToImageFresh" src={howToSlides[howToIndex].image} alt={howToSlides[howToIndex].alt} />
               <div className="animalHowToFooter">
                 <span>{howToIndex + 1} / {howToSlides.length}</span>
-                <strong>← → NEXT / SPACE CLOSE</strong>
+                <strong>CLICK / ← → NEXT / SPACE CLOSE</strong>
               </div>
             </div>
           </div>

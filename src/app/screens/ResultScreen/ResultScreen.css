@@ -84,3 +84,110 @@
   pointer-events: none;
   letter-spacing: .06em;
 }
+
+/* full viewport result */
+.animalResultBack {
+  width: 100vw;
+  height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+.animalResultScreen {
+  width: calc(100vw - 40px);
+  height: calc(100vh - 36px);
+  max-width: none;
+  max-height: none;
+  grid-template-rows: clamp(92px, 15vh, 132px) clamp(132px, 22vh, 172px) 1fr clamp(58px, 10vh, 76px);
+}
+
+.animalResultLogo {
+  width: min(720px, 56vw);
+  height: min(130px, 15vh);
+}
+
+.animalWinner {
+  width: min(980px, 78vw);
+}
+
+.animalRankGrid {
+  align-items: stretch;
+}
+
+.animalRankCard {
+  min-height: 0;
+}
+
+/* PC-game-like result overlay */
+.animalResultBack {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255,255,255,.7) 0 26px, transparent 27px),
+    linear-gradient(180deg, #65dfff 0%, #85e2ff 45%, #9df073 45%, #f0b35a 100%) !important;
+}
+
+.animalResultScreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 28px 64px 34px !important;
+}
+
+.animalWinner,
+.animalRankCard,
+.animalBackKeyPanel {
+  border-color: rgba(255,255,255,.82) !important;
+  background: rgba(20, 58, 74, .58) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,.22), inset 0 0 0 2px rgba(255,255,255,.16) !important;
+  backdrop-filter: blur(7px) !important;
+}
+
+.animalRankScore,
+.animalWinnerScore {
+  color: #ffe66b !important;
+}
+
+.animalRankPlayer,
+.animalRankPlace,
+.animalRankMini,
+.animalWinnerName {
+  color: #fff !important;
+}
+
+.animalResultScreen::before,
+.animalResultScreen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255, 233, 88, .9) 0 5px, transparent 6px),
+    radial-gradient(circle, rgba(239, 89, 71, .82) 0 4px, transparent 5px),
+    radial-gradient(circle, rgba(64, 184, 255, .84) 0 4px, transparent 5px);
+  background-size: 190px 170px, 230px 210px, 270px 190px;
+  animation: resultConfetti 7s linear infinite;
+  opacity: .52;
+}
+
+.animalResultScreen::after {
+  animation-duration: 10s;
+  animation-direction: reverse;
+  opacity: .38;
+}
+
+.animalWinner {
+  animation: winnerPop 1.4s ease-in-out infinite;
+}
+
+@keyframes resultConfetti {
+  from { background-position: 0 -260px, 80px -180px, 180px -240px; }
+  to { background-position: 0 620px, 80px 700px, 180px 640px; }
+}
+
+@keyframes winnerPop {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-5px) scale(1.012); }
+}
