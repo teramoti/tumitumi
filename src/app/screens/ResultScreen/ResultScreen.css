@@ -1,160 +1,27 @@
 .animalResultBack {
-  width: 1280px;
-  height: 720px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
-  background: linear-gradient(180deg, #86e3ff 0%, #bdf4b4 50%, #f8bf67 100%);
-  color: #24170b;
-  overflow: hidden;
-}
-
-.animalResultScreen {
-  width: 1160px;
-  height: 640px;
-  padding: 18px 30px 28px;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-rows: 128px 160px 1fr 76px;
-  gap: 16px;
-  border: 6px solid #7d4c20;
-  border-radius: 34px;
-  background: #fff9df;
-  box-shadow: 0 14px 0 rgba(93, 56, 16, .24);
-}
-
-.animalResultHeader { display: flex; justify-content: center; align-items: center; }
-.animalResultLogo { width: 680px; height: 130px; object-fit: contain; }
-
-.animalWinner {
-  width: 860px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 110px 110px 1fr 240px;
-  align-items: center;
-  gap: 22px;
-  border: 6px solid #9a642d;
-  border-radius: 32px;
-  background: linear-gradient(110deg, #fff0a6, #fffefa 55%, #dff7ff);
-  box-shadow: 0 8px 0 rgba(125, 76, 32, .15);
-  padding: 16px 28px;
-  box-sizing: border-box;
-}
-.animalWinnerStar { width: 96px; height: 96px; object-fit: contain; animation: resultFloat 1.2s ease-in-out infinite; }
-.animalWinnerBadge { width: 92px; height: 92px; object-fit: contain; filter: drop-shadow(0 7px 7px rgba(0,0,0,.18)); }
-.animalWinnerText span { display: block; color: #e94834; font-size: 24px; font-weight: 1000; letter-spacing: .12em; }
-.animalWinnerText strong { display: block; color: #1d1b19; font-size: 66px; line-height: .9; font-weight: 1000; }
-.animalWinnerScore { justify-self: stretch; border-radius: 24px; background: #e8f8ff; border: 4px solid #4fa6f5; color: #126ac0; font-size: 48px; font-weight: 1000; display: grid; place-items: center; }
-@keyframes resultFloat { 50% { transform: translateY(-7px) scale(1.05); } }
-
-.animalRankGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-}
-.animalRankCard {
-  opacity: 0;
-  transform: translateY(32px);
-  padding: 14px 12px;
-  border: 5px solid #c28a42;
-  border-radius: 28px;
-  background: #fffefa;
-  display: grid;
-  grid-template-rows: 42px 80px 38px 45px 1fr;
-  justify-items: center;
-  box-shadow: inset 0 -8px 0 rgba(180, 112, 36, .1), 0 6px 0 rgba(109, 65, 16, .13);
-}
-.animalRankCardShow { animation: rankIn 360ms cubic-bezier(.2,.9,.25,1.2) forwards; }
-@keyframes rankIn { to { opacity: 1; transform: translateY(0); } }
-.rank1 { background: linear-gradient(180deg, #fff0a6, #fffefa 60%); border-color: #e94834; }
-.animalRankNo { width: 46px; height: 46px; border-radius: 50%; background: #e94834; color: #fff; display: grid; place-items: center; font-size: 25px; font-weight: 1000; box-shadow: 0 5px 0 rgba(139, 29, 25, .25); }
-.animalRankBadge { width: 78px; height: 78px; object-fit: contain; }
-.animalRankPlayer { font-size: 30px; font-weight: 1000; }
-.animalRankScore { font-size: 36px; color: #126ac0; font-weight: 1000; }
-.animalRankMini { align-self: end; width: 100%; min-height: 34px; border-radius: 999px; background: #fff1c6; display: grid; place-items: center; font-size: 15px; font-weight: 1000; color: #6b4215; }
-.animalBackButton { justify-self: center; width: 320px; height: 64px; border: none; border-radius: 22px; color: #fff; background: linear-gradient(180deg, #4fc67f, #23874f); box-shadow: 0 8px 0 #16613a; font-family: inherit; font-size: 32px; font-weight: 1000; opacity: 0; pointer-events: none; transform: translateY(12px); transition: opacity .24s, transform .24s; cursor: pointer; }
-.animalBackButtonShow { opacity: 1; pointer-events: auto; transform: translateY(0); }
-.animalBackButton:active { transform: translateY(4px); box-shadow: 0 4px 0 #16613a; }
-
-.animalBackKeyPanel {
-  display: grid;
-  place-items: center;
-  user-select: none;
-  pointer-events: none;
-  letter-spacing: .06em;
-}
-
-/* full viewport result */
-.animalResultBack {
   width: 100vw;
   height: 100vh;
   min-width: 100vw;
   min-height: 100vh;
-}
-
-.animalResultScreen {
-  width: calc(100vw - 40px);
-  height: calc(100vh - 36px);
-  max-width: none;
-  max-height: none;
-  grid-template-rows: clamp(92px, 15vh, 132px) clamp(132px, 22vh, 172px) 1fr clamp(58px, 10vh, 76px);
-}
-
-.animalResultLogo {
-  width: min(720px, 56vw);
-  height: min(130px, 15vh);
-}
-
-.animalWinner {
-  width: min(980px, 78vw);
-}
-
-.animalRankGrid {
-  align-items: stretch;
-}
-
-.animalRankCard {
-  min-height: 0;
-}
-
-/* PC-game-like result overlay */
-.animalResultBack {
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  color: #f5fbff;
   background:
-    radial-gradient(circle at 18% 16%, rgba(255,255,255,.7) 0 26px, transparent 27px),
-    linear-gradient(180deg, #65dfff 0%, #85e2ff 45%, #9df073 45%, #f0b35a 100%) !important;
+    radial-gradient(circle at 22% 18%, rgba(77, 197, 255, .25) 0 170px, transparent 330px),
+    radial-gradient(circle at 78% 18%, rgba(255, 215, 94, .20) 0 160px, transparent 300px),
+    linear-gradient(135deg, #04101d 0%, #102a43 48%, #08131f 100%);
 }
 
 .animalResultScreen {
-  width: 100vw !important;
-  height: 100vh !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 28px 64px 34px !important;
-}
-
-.animalWinner,
-.animalRankCard,
-.animalBackKeyPanel {
-  border-color: rgba(255,255,255,.82) !important;
-  background: rgba(20, 58, 74, .58) !important;
-  color: #fff !important;
-  box-shadow: 0 12px 30px rgba(0,0,0,.22), inset 0 0 0 2px rgba(255,255,255,.16) !important;
-  backdrop-filter: blur(7px) !important;
-}
-
-.animalRankScore,
-.animalWinnerScore {
-  color: #ffe66b !important;
-}
-
-.animalRankPlayer,
-.animalRankPlace,
-.animalRankMini,
-.animalWinnerName {
-  color: #fff !important;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  padding: clamp(24px, 3.4vh, 42px) clamp(44px, 4.5vw, 72px) clamp(28px, 3.5vh, 46px);
+  display: grid;
+  grid-template-rows: clamp(86px, 13vh, 130px) clamp(150px, 22vh, 190px) 1fr clamp(64px, 9vh, 82px);
+  gap: clamp(14px, 2vh, 22px);
 }
 
 .animalResultScreen::before,
@@ -163,23 +30,252 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image:
-    radial-gradient(circle, rgba(255, 233, 88, .9) 0 5px, transparent 6px),
-    radial-gradient(circle, rgba(239, 89, 71, .82) 0 4px, transparent 5px),
-    radial-gradient(circle, rgba(64, 184, 255, .84) 0 4px, transparent 5px);
-  background-size: 190px 170px, 230px 210px, 270px 190px;
-  animation: resultConfetti 7s linear infinite;
-  opacity: .52;
+}
+
+.animalResultScreen::before {
+  background: radial-gradient(circle at 50% 52%, transparent 0 52%, rgba(0,0,0,.28) 100%);
 }
 
 .animalResultScreen::after {
-  animation-duration: 10s;
-  animation-direction: reverse;
-  opacity: .38;
+  opacity: .42;
+  background-image:
+    radial-gradient(circle, rgba(255, 233, 88, .9) 0 4px, transparent 5px),
+    radial-gradient(circle, rgba(239, 89, 71, .8) 0 4px, transparent 5px),
+    radial-gradient(circle, rgba(64, 184, 255, .82) 0 4px, transparent 5px);
+  background-size: 190px 170px, 230px 210px, 270px 190px;
+  animation: resultConfetti 8s linear infinite;
+}
+
+.animalResultHeader,
+.animalWinner,
+.animalRankGrid,
+.animalBackButton {
+  position: relative;
+  z-index: 2;
+}
+
+.animalResultHeader {
+  display: grid;
+  place-items: center;
+}
+
+.animalResultLogo {
+  width: min(620px, 54vw);
+  height: min(126px, 13vh);
+  object-fit: contain;
+  filter: drop-shadow(0 18px 32px rgba(0,0,0,.34));
 }
 
 .animalWinner {
-  animation: winnerPop 1.4s ease-in-out infinite;
+  width: min(1040px, 84vw);
+  margin: 0 auto;
+  padding: 18px 24px;
+  border-radius: 32px;
+  border: 1px solid rgba(255,255,255,.22);
+  background: linear-gradient(180deg, rgba(27, 48, 69, .92), rgba(7, 18, 31, .92));
+  box-shadow: 0 26px 68px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.10);
+  display: grid;
+  grid-template-columns: 96px 108px 1fr 220px;
+  gap: 22px;
+  align-items: center;
+  animation: winnerFloat 1.55s ease-in-out infinite;
+}
+
+.animalWinner::before {
+  content: "WINNER";
+  position: absolute;
+  left: 50%;
+  top: -24px;
+  transform: translateX(-50%) rotate(-1.5deg);
+  height: 46px;
+  min-width: 194px;
+  padding: 0 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.34);
+  background: linear-gradient(180deg, #fff176, #ef8f32);
+  color: #08131f;
+  font-size: 22px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+  box-shadow: 0 14px 30px rgba(0,0,0,.25);
+}
+
+.animalWinnerStar {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 16px rgba(0,0,0,.24));
+  animation: starPulse 1.05s ease-in-out infinite;
+}
+
+.animalWinnerBadge {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 16px rgba(0,0,0,.28));
+}
+
+.animalWinnerText span {
+  display: block;
+  color: #8fd6ff;
+  font-size: 18px;
+  font-weight: 1000;
+  letter-spacing: .16em;
+}
+
+.animalWinnerText strong {
+  display: block;
+  color: #ffffff;
+  font-size: clamp(54px, 6vh, 72px);
+  line-height: .9;
+  font-weight: 1000;
+}
+
+.animalWinnerScore {
+  min-height: 96px;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.08);
+  color: #fff4a2;
+  font-size: clamp(44px, 5vh, 62px);
+  font-weight: 1000;
+  text-shadow: 0 4px 0 rgba(0,0,0,.18);
+}
+
+.animalRankGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(12px, 1.5vw, 18px);
+  align-items: stretch;
+}
+
+.animalRankCard {
+  position: relative;
+  opacity: 0;
+  transform: translateY(32px);
+  min-height: 0;
+  padding: 18px 16px;
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: linear-gradient(180deg, rgba(27, 48, 69, .86), rgba(7, 18, 31, .88));
+  box-shadow: 0 22px 56px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter: blur(7px);
+  display: grid;
+  grid-template-rows: 52px minmax(76px, 1fr) 42px 58px 44px;
+  justify-items: center;
+  align-items: center;
+}
+
+.animalRankCardShow {
+  animation: rankIn 360ms cubic-bezier(.2,.9,.25,1.2) forwards;
+}
+
+.rank1 {
+  border-color: rgba(255, 231, 103, .72);
+  transform: translateY(-8px) scale(1.03);
+}
+
+.rank1::after {
+  content: "★";
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  color: #fff176;
+  font-size: 40px;
+  filter: drop-shadow(0 5px 4px rgba(0,0,0,.25));
+}
+
+.animalRankNo {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ef5d4d, #cc3527);
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 1000;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+.animalRankBadge {
+  width: min(90px, 9vh);
+  height: min(90px, 9vh);
+  object-fit: contain;
+  filter: drop-shadow(0 10px 12px rgba(0,0,0,.24));
+}
+
+.animalRankPlayer {
+  color: #ffffff;
+  font-size: clamp(24px, 3.2vh, 34px);
+  font-weight: 1000;
+}
+
+.animalRankScore {
+  color: #fff4a2;
+  font-size: clamp(32px, 4.2vh, 46px);
+  font-weight: 1000;
+  text-shadow: 0 3px 0 rgba(0,0,0,.18);
+}
+
+.animalRankMini {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 10px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+  color: #dff3ff;
+  font-size: 14px;
+  font-weight: 1000;
+  white-space: nowrap;
+}
+
+.animalBackButton {
+  justify-self: center;
+  width: min(380px, 40vw);
+  height: 70px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #8be25b 0%, #36b85d 48%, #168246 100%);
+  color: #ffffff;
+  box-shadow: 0 18px 38px rgba(41,190,91,.28), inset 0 1px 0 rgba(255,255,255,.34);
+  font-family: inherit;
+  font-size: 28px;
+  font-weight: 1000;
+  letter-spacing: .04em;
+  text-shadow: 0 3px 0 rgba(0,0,0,.22);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity .22s ease, transform .22s ease, filter .16s ease;
+}
+
+.animalBackButtonShow {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  animation: backButtonPulse 1.1s ease-in-out infinite;
+}
+
+.animalBackButton:hover:not(:disabled) {
+  filter: brightness(1.07);
+}
+
+.animalBackButton:active:not(:disabled) {
+  transform: translateY(3px) scale(.99);
+}
+
+.animalBackButton:disabled {
+  opacity: 0;
+  pointer-events: none;
+  cursor: default;
 }
 
 @keyframes resultConfetti {
@@ -187,7 +283,154 @@
   to { background-position: 0 620px, 80px 700px, 180px 640px; }
 }
 
-@keyframes winnerPop {
+@keyframes rankIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes winnerFloat {
   0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-5px) scale(1.012); }
+  50% { transform: translateY(-5px) scale(1.01); }
+}
+
+@keyframes starPulse {
+  0%, 100% { transform: rotate(-5deg) scale(1); }
+  50% { transform: rotate(6deg) scale(1.08); }
+}
+
+@keyframes backButtonPulse {
+  0%, 100% { box-shadow: 0 18px 38px rgba(41,190,91,.28), 0 0 0 0 rgba(139,226,91,0), inset 0 1px 0 rgba(255,255,255,.34); }
+  50% { box-shadow: 0 18px 38px rgba(41,190,91,.28), 0 0 0 8px rgba(139,226,91,.12), inset 0 1px 0 rgba(255,255,255,.34); }
+}
+
+@media (max-width: 1120px) {
+  .animalResultScreen {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .animalWinner {
+    width: 92vw;
+    grid-template-columns: 76px 80px 1fr 170px;
+  }
+
+  .animalRankGrid {
+    gap: 10px;
+  }
+
+  .animalRankCard {
+    padding: 14px 10px;
+  }
+}
+
+/* MORE pass: sale-quality result readability */
+.animalWinnerText em {
+  display: inline-grid;
+  place-items: center;
+  width: fit-content;
+  min-height: 32px;
+  margin-top: 8px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  color: #fff4a2;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+}
+
+.animalWinnerScore {
+  grid-template-rows: auto 1fr !important;
+  gap: 2px !important;
+}
+
+.animalWinnerScore span {
+  align-self: end;
+  color: #8fd6ff;
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .16em;
+}
+
+.animalWinnerScore strong {
+  align-self: start;
+  color: #fff4a2;
+  font-size: clamp(42px, 5vh, 58px);
+  line-height: 1;
+  font-weight: 1000;
+}
+
+.animalRankCard {
+  grid-template-rows: 48px minmax(58px, .7fr) 34px 48px 34px auto !important;
+  gap: 4px;
+}
+
+.animalRankBreakdown {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.animalRankBreakdown span {
+  min-height: 24px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(255,255,255,.06);
+  color: rgba(225, 240, 255, .86);
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+@media (max-height: 760px) {
+  .animalResultScreen {
+    padding: 18px 42px 22px !important;
+    grid-template-rows: 78px 132px 1fr 58px !important;
+    gap: 10px !important;
+  }
+
+  .animalWinner {
+    padding: 12px 18px !important;
+    grid-template-columns: 72px 78px 1fr 180px !important;
+    gap: 14px !important;
+  }
+
+  .animalWinnerStar,
+  .animalWinnerBadge {
+    width: 72px !important;
+    height: 72px !important;
+  }
+
+  .animalWinnerText strong {
+    font-size: 44px !important;
+  }
+
+  .animalWinnerScore {
+    min-height: 78px !important;
+  }
+
+  .animalRankCard {
+    padding: 10px 10px !important;
+    grid-template-rows: 38px 54px 30px 38px 28px auto !important;
+  }
+
+  .animalRankNo {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 19px !important;
+  }
+
+  .animalRankMini,
+  .animalRankBreakdown span {
+    font-size: 10px !important;
+    min-height: 22px !important;
+  }
+
+  .animalBackButton {
+    height: 56px !important;
+    font-size: 23px !important;
+  }
 }

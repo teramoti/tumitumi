@@ -1,3 +1,4 @@
+// メンバー向けコメント: このファイルの役割と、変更時に触るべき場所を追いやすくするための注釈を入れています。
 import { useState, lazy, Suspense } from 'react'
 import StartScreen from './screens/StartScreen/StartScreen'
 import ResultScreen from './screens/ResultScreen/ResultScreen'
@@ -5,6 +6,7 @@ import { getGameManagerPlayerCount } from '../game/GameManager'
 
 const GameScreen = lazy(() => import('./screens/GameScreen/GameScreen'))
 
+// 画面遷移は start → game → result の3状態で管理します。
 type Screen = 'start' | 'game' | 'result'
 
 export type GameSettings = {
@@ -58,6 +60,7 @@ type RawGameResult = GameResult | {
   results?: LoosePlayerResult[]
 }
 
+// Phaser側・旧形式どちらの結果でもResultScreenで扱える形へ変換します。
 function normalizeGameResult(raw: RawGameResult): GameResult {
   if (Array.isArray(raw.results)) {
     const results = raw.results
@@ -107,6 +110,7 @@ export default function App() {
 
 
 
+  // StartScreenから受け取った難易度に、GameManager側の人数を合成して開始します。
   const handleStart = (nextSettings: Omit<GameSettings, 'playerCount'>) => {
     setSettings({
       ...nextSettings,
@@ -115,6 +119,7 @@ export default function App() {
     setScreen('game')
   }
 
+  // Phaserの終了結果を正規化してResultScreenへ渡します。
   const handleFinish = (rawResult: RawGameResult) => {
     setResult(normalizeGameResult(rawResult))
     setScreen('result')

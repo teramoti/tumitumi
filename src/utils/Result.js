@@ -1,3 +1,5 @@
+// メンバー向けコメント: このファイルの役割と、変更時に触るべき場所を追いやすくするための注釈を入れています。
+// スコア配列から順位配列を作ります。同点は同順位です。
 export function getRanksFromScores(scores) {
     if (!Array.isArray(scores)) {
         throw new TypeError('scores must be an array')

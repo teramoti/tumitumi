@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+// メンバー向けコメント: このファイルの役割と、変更時に触るべき場所を追いやすくするための注釈を入れています。
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './ResultScreen.css'
 import { getRanksFromScores } from '../../../utils/Result.js'
 import type { GameResult } from '../../App'
 const resultBgm = '/assets/result_bgm.wav'
+import { AUDIO_LEVELS } from '../../audio/audioLevels'
 import { playClickSound } from '../../audio/playClickSound'
 
 type Props = {
@@ -17,6 +19,7 @@ const PLAYER_MARKER_IMAGE_PATHS = [
   '/assets/player_badge_p4.png'
 ]
 
+// 同点時に同じ順位を表示するための順位計算です。
 function getDisplayedRank(results: GameResult['results']) {
   let currentRank = 0
   let previousScore: number | null = null
@@ -29,12 +32,34 @@ function getDisplayedRank(results: GameResult['results']) {
   })
 }
 
+
+function getWinnerReason(entry: GameResult['results'][number]) {
+  const success = entry.successes ?? 0
+  const misses = entry.misses ?? 0
+  const hp = entry.hp ?? 0
+  if (misses === 0 && success > 0) return 'NO MISS WIN'
+  if (hp >= 2) return 'HP BONUS WIN'
+  if (success >= 3) return 'STACK MASTER'
+  return 'BEST SCORE'
+}
+
+function formatBonus(entry: GameResult['results'][number]) {
+  return [
+    `DROP ${entry.dropPoints ?? 0}`,
+    `HP ${entry.hpBonus ?? 0}`,
+    `LIVE ${entry.survivalBonus ?? 0}`,
+    `PEN -${entry.missPenalty ?? 0}`
+  ]
+}
+
+// 結果画面。勝者、順位、タイトルへ戻る操作を表示します。
 export default function ResultScreen({ result, onBack }: Props) {
   const [showRanks, setShowRanks] = useState(false)
   const [showBack, setShowBack] = useState(false)
   const rankTimerRef = useRef<number | null>(null)
   const backTimerRef = useRef<number | null>(null)
 
+  // スコア降順で並べ、同点ならプレイヤー番号順にします。
   const rankedResults = useMemo(
     () => [...result.results].sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score
@@ -49,6 +74,7 @@ export default function ResultScreen({ result, onBack }: Props) {
   useEffect(() => {
     const audio = new Audio(resultBgm)
     audio.loop = true
+    audio.volume = AUDIO_LEVELS.resultBgm
 
     const playBgm = () => {
       void audio.play().catch(() => {
@@ -74,7 +100,7 @@ export default function ResultScreen({ result, onBack }: Props) {
     backTimerRef.current = window.setTimeout(() => {
       setShowBack(true)
       backTimerRef.current = null
-    }, 720)
+    }, 420)
 
     return () => {
       if (rankTimerRef.current !== null) window.clearTimeout(rankTimerRef.current)
@@ -82,7 +108,9 @@ export default function ResultScreen({ result, onBack }: Props) {
     }
   }, [])
 
-  const handleBack = () => {
+  // GameClear通知を親へ送り、タイトル画面へ戻ります。
+  const handleBack = useCallback(() => {
+    if (!showBack) return
     playClickSound()
 
     const scoresByPlayer = [...result.results]
@@ -92,7 +120,7 @@ export default function ResultScreen({ result, onBack }: Props) {
 
     window.parent.postMessage({ type: 'GameClear', rank }, '*')
     onBack()
-  }
+  }, [onBack, result.results, showBack])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -104,13 +132,13 @@ export default function ResultScreen({ result, onBack }: Props) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  })
+  }, [handleBack])
 
   return (
     <div className="animalResultBack">
       <main className="animalResultScreen">
         <header className="animalResultHeader">
-          <img className="animalResultLogo" src="/assets/ui_animal_result.png" alt="RESULT" />
+          <img className="animalResultLogo" src="/assets/ui_jam_result.png" alt="RESULT" />
         </header>
 
         {winner && (
@@ -120,8 +148,12 @@ export default function ResultScreen({ result, onBack }: Props) {
             <div className="animalWinnerText">
               <span>WINNER</span>
               <strong>P{winner.player}</strong>
+              <em>{getWinnerReason(winner)}</em>
             </div>
-            <div className="animalWinnerScore">{winner.score}</div>
+            <div className="animalWinnerScore">
+              <span>SCORE</span>
+              <strong>{winner.score}</strong>
+            </div>
           </section>
         )}
 
@@ -139,14 +171,22 @@ export default function ResultScreen({ result, onBack }: Props) {
                 <div className="animalRankPlayer">P{entry.player}</div>
                 <div className="animalRankScore">{entry.score}</div>
                 <div className="animalRankMini">OK {entry.successes ?? 0} / MISS {entry.misses ?? 0}</div>
+                <div className="animalRankBreakdown">
+                  {formatBonus(entry).map((label) => <span key={label}>{label}</span>)}
+                </div>
               </article>
             )
           })}
         </section>
 
-        <div className={`animalBackButton animalBackKeyPanel ${showBack ? 'animalBackButtonShow' : ''}`}>
-          SPACE / ENTER  TITLE
-        </div>
+        <button
+          type="button"
+          className={`animalBackButton animalBackKeyPanel ${showBack ? 'animalBackButtonShow' : ''}`}
+          disabled={!showBack}
+          onClick={handleBack}
+        >
+          TITLEへ戻る
+        </button>
       </main>
     </div>
   )

@@ -1,4 +1,6 @@
+/* メンバー向けコメント: このCSSは画面ごとの見た目調整用です。大きく崩す前に各セクションコメントを確認してください。 */
 html,
+/* 画面全体の背景と、1280x720ゲームを中央表示する基本設定。 */
 body {
   width: 100%;
   height: 100%;
@@ -13,6 +15,7 @@ body {
   overflow: hidden;
 }
 
+/* Reactの描画先。Phaser canvasと各画面をこの中に表示します。 */
 #root {
   width: 100vw;
   height: 100vh;

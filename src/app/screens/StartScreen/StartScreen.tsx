@@ -1,8 +1,10 @@
+// メンバー向けコメント: このファイルの役割と、変更時に触るべき場所を追いやすくするための注釈を入れています。
 import { useEffect, useState } from 'react'
 import './StartScreen.css'
 
 const startBgm = '/assets/start_bgm.wav'
 
+import { AUDIO_LEVELS } from '../../audio/audioLevels'
 import { playClickSound } from '../../audio/playClickSound'
 import { DIFFICULTY_LABELS, getMaxTurns, type Difficulty } from '../../data/gameRules'
 
@@ -16,43 +18,28 @@ type Props = {
 const difficultyOrder: Difficulty[] = ['easy', 'normal', 'hard']
 
 const howToSlides = [
-  { image: '/assets/ui_animal_howto_1.png', alt: '左右でねらう' },
-  { image: '/assets/ui_animal_howto_2.png', alt: '落とす場所を決める' },
-  { image: '/assets/ui_animal_howto_3.png', alt: '崩さず積む' }
+  { image: '/assets/ui_jam_howto_1.png', alt: '位置・角度・落とす' },
+  { image: '/assets/ui_jam_howto_4.png', alt: '勝敗とリザルト' }
 ]
 
 function TowerPreview() {
-  const ringAnimals = [
-    '/assets/animal_cat.png',
-    '/assets/animal_panda.png',
-    '/assets/animal_crocodile.png',
-    '/assets/animal_giraffe.png',
-    '/assets/animal_rabbit.png',
-    '/assets/animal_elephant.png'
-  ]
-
   return (
-    <div className="animalTowerPreview steamPreview" aria-hidden="true">
-      <div className="previewSun" />
-      <div className="previewCloud cloudA" />
-      <div className="previewCloud cloudB" />
-      <div className="previewSpotlight" />
-      <div className="shapeBadge shapeCircle">ROUND</div>
-      <div className="shapeBadge shapeBox">BOX</div>
-      <div className="shapeBadge shapeLong">LONG</div>
-      <div className="animalOrbit">
-        {ringAnimals.map((src, index) => (
-          <img className={`orbitAnimal orbitAnimal${index + 1}`} src={src} alt="" key={src} />
-        ))}
+    <div className="animalTowerPreview finalPosterPreview jamTitleStage" aria-hidden="true">
+      <div className="jamTitleMountains" />
+      <div className="jamTitleSpotlight jamTitleSpotlightLeft" />
+      <div className="jamTitleSpotlight jamTitleSpotlightRight" />
+      <div className="jamTitleDropRail" />
+      <div className="jamTitleArrow" />
+      <div className="jamAnimalMiniStack">
+        <img className="jamMiniAnimal jamMiniGiraffe" src="/assets/animal_giraffe.png" alt="" />
+        <img className="jamMiniAnimal jamMiniRabbit" src="/assets/animal_rabbit.png" alt="" />
+        <img className="jamMiniAnimal jamMiniPanda" src="/assets/animal_panda.png" alt="" />
+        <img className="jamMiniAnimal jamMiniFox" src="/assets/animal_fox.png" alt="" />
+        <img className="jamMiniAnimal jamMiniTurtle" src="/assets/animal_turtle.png" alt="" />
+        <img className="jamMiniAnimal jamMiniElephant" src="/assets/animal_elephant.png" alt="" />
       </div>
-      <img className="animalDrop drop1" src="/assets/animal_penguin.png" alt="" />
-      <img className="animalDrop drop2" src="/assets/animal_lion.png" alt="" />
-      <img className="animalDrop drop3" src="/assets/animal_crocodile.png" alt="" />
-      <img className="animalDrop drop4" src="/assets/animal_giraffe.png" alt="" />
-      <img className="animalDrop drop5" src="/assets/animal_panda.png" alt="" />
-      <div className="comboRibbon">16 ANIMALS / PHYSICS STACK</div>
-      <div className="animalStage" />
-      <div className="stageGlow" />
+      <div className="jamTitleStageBase">DROP ZONE</div>
+      <div className="finalPreviewScanline" />
     </div>
   )
 }
@@ -66,6 +53,7 @@ export default function StartScreen({ playerCount, onStart }: Props) {
   useEffect(() => {
     const audio = new Audio(startBgm)
     audio.loop = true
+    audio.volume = AUDIO_LEVELS.startBgm
 
     const playBgm = () => {
       void audio.play().catch(() => {
@@ -181,60 +169,54 @@ export default function StartScreen({ playerCount, onStart }: Props) {
   const maxTurns = getMaxTurns(difficulty)
 
   return (
-    <div className="animalStartBack">
-      <main className="animalStartScreen animalStartScreenFresh">
-        <header className="animalStartHeader animalStartHeaderFresh">
-          <img className="animalTitleLogo animalTitleLogoFresh" src="/assets/ui_animal_title.png" alt="ANIMAL TOWER BATTLE" />
+    <div className="animalStartBack finalStartBack">
+      <main className="animalStartScreen finalStartScreen">
+        <TowerPreview />
+
+        <header className="finalHeroHeader">
+          <div className="finalHeroMeta">GAME JAM FINAL / 30-60 SEC PARTY</div>
+          <h1>ぐらぐら<br />アニマルタワー</h1>
+          <p>会場で説明なしでも遊べる。動物は手番開始で固定、操作は位置・角度・落とすだけ。</p>
         </header>
 
-        <section className="animalStartBody animalStartBodyFresh">
-          <TowerPreview />
+        <aside className="finalCommandDeck" aria-label="タイトルメニュー">
+          <div className="finalDeckInfo">
+            <span>LOCAL JAM</span>
+            <strong>{playerCount}P</strong>
+            <em>交代制</em>
+          </div>
 
-          <aside className="animalStartMenu animalStartMenuFresh steamMenu">
-            <div className="steamMenuHeader">
-              <span>PARTY STACK MODE</span>
-              <strong>LOCAL 4P</strong>
-            </div>
-            <img className="animalRuleImage animalRuleImageFresh" src="/assets/ui_animal_rule.png" alt="操作説明" />
+          <div
+            className={`finalDifficultyCard ${selectedMenuIndex === 0 ? 'menuFocus' : ''}`}
+            onMouseEnter={() => setSelectedMenuIndex(0)}
+            onClick={() => {
+              playClickSound()
+              setDifficulty((value) => {
+                const index = difficultyOrder.indexOf(value)
+                return difficultyOrder[(index + 1) % difficultyOrder.length]
+              })
+            }}
+            onWheel={(event) => {
+              event.preventDefault()
+              playClickSound()
+              setDifficulty((value) => {
+                const index = difficultyOrder.indexOf(value)
+                return difficultyOrder[(index + (event.deltaY > 0 ? 1 : difficultyOrder.length - 1)) % difficultyOrder.length]
+              })
+            }}
+          >
+            <span>DIFFICULTY</span>
+            <strong>{DIFFICULTY_LABELS[difficulty]}</strong>
+            <em>{maxTurns} TURN</em>
+          </div>
 
-            <div className="animalInfoGrid animalInfoGridFresh">
-              <div className="animalInfoCard animalInfoCardFresh">
-                <span>PLAYERS</span>
-                <strong>{playerCount}</strong>
-              </div>
-              <div
-                className={`animalInfoCard animalInfoCardFresh animalModeButton ${selectedMenuIndex === 0 ? 'menuFocus' : ''}`}
-                onMouseEnter={() => setSelectedMenuIndex(0)}
-                onClick={() => {
-                  playClickSound()
-                  setDifficulty((value) => {
-                    const index = difficultyOrder.indexOf(value)
-                    return difficultyOrder[(index + 1) % difficultyOrder.length]
-                  })
-                }}
-                onWheel={(event) => {
-                  event.preventDefault()
-                  playClickSound()
-                  setDifficulty((value) => {
-                    const index = difficultyOrder.indexOf(value)
-                    return difficultyOrder[(index + (event.deltaY > 0 ? 1 : difficultyOrder.length - 1)) % difficultyOrder.length]
-                  })
-                }}
-              >
-                <span>MODE</span>
-                <strong>{DIFFICULTY_LABELS[difficulty]}</strong>
-                <em>{maxTurns} TURN</em>
-              </div>
-            </div>
+          <img className="finalRuleStrip" src="/assets/ui_jam_rule_strip.png" alt="操作説明" />
 
-            <div className="menuKeyHint mouseKeyHint">
-              <span>MOUSE / ↑↓</span>
-              <span>CLICK / SPACE</span>
-              <span>WHEEL / Q E</span>
-            </div>
 
-            <div
-              className={`animalStartButton animalKeyOnlyButton ${selectedMenuIndex === 1 ? 'menuFocus' : ''}`}
+          <div className="finalDeckButtons">
+            <button
+              type="button"
+              className={`finalStartButton ${selectedMenuIndex === 1 ? 'menuFocus' : ''}`}
               onMouseEnter={() => setSelectedMenuIndex(1)}
               onClick={() => {
                 playClickSound()
@@ -242,10 +224,10 @@ export default function StartScreen({ playerCount, onStart }: Props) {
               }}
             >
               START
-            </div>
-
-            <div
-              className={`animalHowToButton animalKeyOnlyButton ${selectedMenuIndex === 2 ? 'menuFocus' : ''}`}
+            </button>
+            <button
+              type="button"
+              className={`finalHowToButton ${selectedMenuIndex === 2 ? 'menuFocus' : ''}`}
               onMouseEnter={() => setSelectedMenuIndex(2)}
               onClick={() => {
                 playClickSound()
@@ -254,14 +236,20 @@ export default function StartScreen({ playerCount, onStart }: Props) {
               }}
             >
               HOW TO
-            </div>
-          </aside>
-        </section>
+            </button>
+          </div>
+        </aside>
+
+        <div className="finalKeyHint" aria-hidden="true">
+          <span>↑↓ SELECT</span>
+          <span>←→ DIFFICULTY</span>
+          <span>ENTER / CLICK</span>
+        </div>
 
         {isHowToOpen && (
-          <div className="animalDialogLayer" role="presentation">
+          <div className="animalDialogLayer finalHowToLayer" role="presentation">
             <div
-              className="animalHowToDialog animalHowToDialogFresh"
+              className="animalHowToDialog finalHowToDialog"
               role="dialog"
               aria-modal="true"
               aria-label="遊び方"
@@ -281,10 +269,11 @@ export default function StartScreen({ playerCount, onStart }: Props) {
                 setHowToIndex((value) => Math.max(0, Math.min(howToSlides.length - 1, value + (event.deltaY > 0 ? 1 : -1))))
               }}
             >
-              <img className="animalHowToImage animalHowToImageFresh" src={howToSlides[howToIndex].image} alt={howToSlides[howToIndex].alt} />
-              <div className="animalHowToFooter">
+              <img className="animalHowToImage finalHowToImage" src={howToSlides[howToIndex].image} alt={howToSlides[howToIndex].alt} />
+              <div className="animalHowToFooter finalHowToFooter">
                 <span>{howToIndex + 1} / {howToSlides.length}</span>
-                <strong>CLICK / ← → NEXT / SPACE CLOSE</strong>
+                <strong>クリックで次へ / SPACEで閉じる</strong>
+                <em>ESCでも閉じる</em>
               </div>
             </div>
           </div>
